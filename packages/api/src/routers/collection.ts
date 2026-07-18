@@ -81,6 +81,43 @@ export const collectionRouter = router({
       return { ok: true };
     }),
 
+  /** Export CSV de la collection — fonctionnalité PRO. */
+  exportCsv: protectedProcedure.query(async ({ ctx }) => {
+    const plan = await getUserPlan(ctx.db, ctx.user.id);
+    if (plan !== "pro") {
+      throw new TRPCError({ code: "FORBIDDEN", message: "PRO_REQUIRED:export" });
+    }
+    const items = await ctx.db.query.collectionItems.findMany({
+      where: eq(collectionItems.userId, ctx.user.id),
+      with: {
+        card: { with: { set: { with: { game: true } } } },
+        sealedProduct: { with: { set: true } },
+      },
+    });
+    const escape = (value: string) => `"${value.replaceAll('"', '""')}"`;
+    const header = "game,set,name,number,language,condition,foil,quantity,acquired_price_eur";
+    const lines = items.map((item) => {
+      const game = item.card?.set.game.name ?? "";
+      const set = item.card?.set.name ?? item.sealedProduct?.set.name ?? "";
+      const name = item.card?.name ?? item.sealedProduct?.name ?? "";
+      const number = item.card?.number ?? "";
+      return [
+        escape(game),
+        escape(set),
+        escape(name),
+        escape(number),
+        item.cardLanguage ?? "",
+        item.condition ?? "",
+        item.isFoil ? "1" : "0",
+        String(item.quantity),
+        item.acquiredPriceCents != null
+          ? (item.acquiredPriceCents / 100).toFixed(2)
+          : "",
+      ].join(",");
+    });
+    return { csv: [header, ...lines].join("\n"), count: items.length };
+  }),
+
   /**
    * Valeur du portfolio jour par jour sur la période, pour le graphique
    * 1J/7J/1M/3M/6M/MAX. La cote utilisée est le dernier prix connu par

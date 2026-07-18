@@ -527,6 +527,14 @@ export const alerts = cardtradeSchema.table(
 // Relations
 // ---------------------------------------------------------------------------
 
+export const alertsRelations = relations(alerts, ({ one }) => ({
+  card: one(cards, { fields: [alerts.cardId], references: [cards.id] }),
+  sealedProduct: one(sealedProducts, {
+    fields: [alerts.sealedProductId],
+    references: [sealedProducts.id],
+  }),
+}));
+
 export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(profiles, { fields: [users.id], references: [profiles.userId] }),
   listings: many(listings),

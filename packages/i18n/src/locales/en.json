@@ -190,6 +190,22 @@
     "placeholder": "Your message…",
     "empty": "Start the conversation 👋"
   },
+  "searchTabs": {
+    "cards": "Catalog",
+    "listings": "Listings"
+  },
+  "alerts": {
+    "create": "🔔 Alert me on this card",
+    "created": "Alert created ✓ — you'll be notified when a nearby listing appears",
+    "title": "My alerts",
+    "delete": "Delete",
+    "limit": "1 alert on the free plan — go PRO for unlimited alerts"
+  },
+  "exportCsv": {
+    "button": "Export my collection (CSV)",
+    "done": "{{count}} rows exported ✓",
+    "webOnly": "Export available on the web version"
+  },
   "collectionAdd": {
     "title": "Add to my collection",
     "add": "Add",

@@ -316,6 +316,19 @@ Pour tester « en vrai » : lance `pnpm server` + `pnpm web` et clique partout.
 
 ---
 
+## 6bis. 🌐 La recette = la version web
+
+La stratégie de mise en production : **le site web sert d'environnement de
+recette** (tests réels entre nous), et les apps iOS/Android ne seront soumises
+aux stores qu'au dernier moment, une fois tout validé sur le web.
+
+- Un seul process Node sert l'API (`/trpc`) **et** le site web (`/`) — voir
+  `deploy/VPS_SETUP.md` pour l'installation one-time sur le VPS.
+- Ensuite, chaque push sur `main` déploie automatiquement la recette
+  (workflow « Deploy recette web to VPS », mêmes secrets GitHub que Loqato).
+- Vérification rapide après déploiement : `https://<domaine>/health` → `{"ok":true}`.
+- Les cotes se mettent à jour toutes les 24 h (`PRICE_SYNC_INTERVAL_HOURS=24`).
+
 ## 7. 🚀 Enregistrer et publier ses modifications
 
 ### Sauvegarder son travail (Git en 4 commandes)

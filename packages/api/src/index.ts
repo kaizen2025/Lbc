@@ -1,4 +1,5 @@
 import { router } from "./trpc.js";
+import { alertsRouter } from "./routers/alerts.js";
 import { catalogRouter } from "./routers/catalog.js";
 import { listingsRouter } from "./routers/listings.js";
 import { offersRouter } from "./routers/offers.js";
@@ -10,6 +11,7 @@ import { subscriptionRouter } from "./routers/subscription.js";
 import { transactionsRouter } from "./routers/transactions.js";
 
 export const appRouter = router({
+  alerts: alertsRouter,
   catalog: catalogRouter,
   listings: listingsRouter,
   offers: offersRouter,

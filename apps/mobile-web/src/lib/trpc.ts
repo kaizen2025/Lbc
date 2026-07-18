@@ -6,7 +6,9 @@ import type { AppRouter } from "@cardtrade/api";
 /** Client tRPC typé bout-en-bout — les types viennent directement du serveur. */
 export const trpc = createTRPCReact<AppRouter>();
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3001";
+const API_BASE = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3001";
+/** En recette web, l'app est servie par le serveur lui-même → même origine. */
+const API_URL = `${API_BASE.replace(/\/$/, "")}/trpc`;
 
 /** Jeton d'auth injecté par le provider de session (Supabase). */
 let currentToken: string | null = null;

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import { Link } from "expo-router";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Link, router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@cardtrade/i18n";
 import { Card, Muted, PriceChange, Screen, SectionTitle } from "../../src/components/ui";
@@ -22,6 +22,32 @@ export default function PortfolioScreen() {
     { retry: false },
   );
   const items = trpc.collection.list.useQuery(undefined, { retry: false });
+  const utils = trpc.useUtils();
+  const [exportStatus, setExportStatus] = useState<string | null>(null);
+
+  async function exportCsv() {
+    if (Platform.OS !== "web") {
+      setExportStatus(t("exportCsv.webOnly"));
+      return;
+    }
+    try {
+      const { csv, count } = await utils.collection.exportCsv.fetch();
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = "cardtrade-collection.csv";
+      anchor.click();
+      URL.revokeObjectURL(url);
+      setExportStatus(t("exportCsv.done", { count }));
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith("PRO_REQUIRED")) {
+        router.push("/paywall");
+      } else {
+        setExportStatus(t("common.error"));
+      }
+    }
+  }
 
   const points = history.data ?? [];
   const latest = points[points.length - 1]?.totalCents ?? 0;
@@ -90,6 +116,12 @@ export default function PortfolioScreen() {
           <Text style={styles.addButtonText}>+ {t("portfolio.addCard")}</Text>
         </Pressable>
       </Link>
+      <Pressable style={styles.addButton} onPress={() => void exportCsv()}>
+        <Text style={styles.addButtonText}>
+          {t("exportCsv.button")} {t("paywall.proBadge")}
+        </Text>
+      </Pressable>
+      {exportStatus && <Muted>{exportStatus}</Muted>}
       {items.isError && <Muted>{t("auth.signIn")}</Muted>}
       {items.data?.map((item) => (
         <Card key={item.id}>

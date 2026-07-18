@@ -190,6 +190,22 @@
     "placeholder": "Ton message…",
     "empty": "Démarre la conversation 👋"
   },
+  "searchTabs": {
+    "cards": "Catalogue",
+    "listings": "Annonces"
+  },
+  "alerts": {
+    "create": "🔔 M'alerter sur cette carte",
+    "created": "Alerte créée ✓ — tu seras prévenu dès qu'une annonce proche apparaît",
+    "title": "Mes alertes",
+    "delete": "Supprimer",
+    "limit": "1 alerte en gratuit — passe PRO pour des alertes illimitées"
+  },
+  "exportCsv": {
+    "button": "Exporter ma collection (CSV)",
+    "done": "{{count}} lignes exportées ✓",
+    "webOnly": "Export disponible sur la version web"
+  },
   "collectionAdd": {
     "title": "Ajouter à ma collection",
     "add": "Ajouter",

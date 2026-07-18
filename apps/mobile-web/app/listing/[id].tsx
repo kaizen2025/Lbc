@@ -43,6 +43,7 @@ export default function ListingDetailScreen() {
     onSuccess: (created) =>
       created && router.push(`/conversation/${created.conversationId}`),
   });
+  const createAlert = trpc.alerts.create.useMutation();
 
   if (!listing.data) {
     return (
@@ -158,6 +159,30 @@ export default function ListingDetailScreen() {
             </Pressable>
           )}
 
+          {item.cardId != null && (
+            <Card>
+              <Pressable
+                disabled={createAlert.isPending || createAlert.isSuccess}
+                onPress={() =>
+                  createAlert.mutate({
+                    cardId: item.cardId!,
+                    cardLanguage: item.cardLanguage ?? undefined,
+                  })
+                }
+              >
+                <Text style={styles.alertButton}>{t("alerts.create")}</Text>
+              </Pressable>
+              {createAlert.isSuccess && <Muted>{t("alerts.created")}</Muted>}
+              {createAlert.isError && (
+                <Muted>
+                  {createAlert.error.message.startsWith("PRO_REQUIRED")
+                    ? t("alerts.limit")
+                    : createAlert.error.message}
+                </Muted>
+              )}
+            </Card>
+          )}
+
           <SectionTitle>{t("listing.contactSeller")}</SectionTitle>
           <Card>
             <TextInput
@@ -200,4 +225,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   declineText: { color: colors.negative, fontWeight: "700" },
+  alertButton: { color: colors.gold, fontSize: 16, fontWeight: "700" },
 });

@@ -20,6 +20,14 @@ export default function ProfileScreen() {
     retry: false,
     enabled: !!session,
   });
+  const alerts = trpc.alerts.list.useQuery(undefined, {
+    retry: false,
+    enabled: !!session,
+  });
+  const utils = trpc.useUtils();
+  const removeAlert = trpc.alerts.remove.useMutation({
+    onSuccess: () => void utils.alerts.list.invalidate(),
+  });
 
   const currentLanguage = normalizeLanguage(i18n.language);
   const nextLanguage = currentLanguage === "fr" ? "en" : "fr";
@@ -77,6 +85,23 @@ export default function ProfileScreen() {
                 </Card>
               </Pressable>
             </Link>
+          ))}
+        </>
+      )}
+
+      {session && (alerts.data?.length ?? 0) > 0 && (
+        <>
+          <SectionTitle>{t("alerts.title")}</SectionTitle>
+          {alerts.data?.map((alert) => (
+            <Card key={alert.id}>
+              <Text style={styles.txTitle}>
+                {alert.card?.name ?? alert.sealedProduct?.name ?? "—"}
+                {alert.cardLanguage ? ` · ${alert.cardLanguage.toUpperCase()}` : ""}
+              </Text>
+              <Pressable onPress={() => removeAlert.mutate({ id: alert.id })}>
+                <Text style={styles.signOut}>{t("alerts.delete")}</Text>
+              </Pressable>
+            </Card>
           ))}
         </>
       )}

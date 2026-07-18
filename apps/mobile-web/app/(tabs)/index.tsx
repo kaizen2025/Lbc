@@ -1,4 +1,5 @@
-import { Text, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
+import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@cardtrade/i18n";
 import { Card, Muted, Screen, SectionTitle } from "../../src/components/ui";
@@ -16,19 +17,25 @@ export default function HomeScreen() {
       {nearby.isError && <Muted>{t("common.error")}</Muted>}
       {nearby.data?.items.length === 0 && <Muted>{t("search.noResults")}</Muted>}
       {nearby.data?.items.map(({ listing, distanceKm }) => (
-        <Card key={listing.id}>
-          <Text style={styles.listingTitle}>
-            {listing.description ?? `${t(`listing.${listing.type}`)} · #${listing.id.slice(0, 8)}`}
-          </Text>
-          <Muted>
-            {listing.city ?? "—"} · {t("home.distanceAway", { distance: distanceKm.toFixed(1) })}
-          </Muted>
-          {listing.priceCents != null && (
-            <Text style={styles.price}>
-              {formatCurrency(listing.priceCents, listing.currency, i18n.language)}
-            </Text>
-          )}
-        </Card>
+        <Link key={listing.id} href={`/listing/${listing.id}`} asChild>
+          <Pressable>
+            <Card>
+              <Text style={styles.listingTitle}>
+                {listing.description ??
+                  `${t(`listing.${listing.type}`)} · #${listing.id.slice(0, 8)}`}
+              </Text>
+              <Muted>
+                {listing.city ?? "—"} ·{" "}
+                {t("home.distanceAway", { distance: distanceKm.toFixed(1) })}
+              </Muted>
+              {listing.priceCents != null && (
+                <Text style={styles.price}>
+                  {formatCurrency(listing.priceCents, listing.currency, i18n.language)}
+                </Text>
+              )}
+            </Card>
+          </Pressable>
+        </Link>
       ))}
 
       <SectionTitle>{t("home.marketMovers")}</SectionTitle>

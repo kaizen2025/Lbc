@@ -143,6 +143,75 @@
     "email": "Email",
     "password": "Mot de passe",
     "continueWithApple": "Continuer avec Apple",
-    "continueWithGoogle": "Continuer avec Google"
+    "continueWithGoogle": "Continuer avec Google",
+    "noAccount": "Pas encore de compte ? Crée-le ici",
+    "haveAccount": "Déjà un compte ? Connecte-toi",
+    "checkEmail": "Vérifie ta boîte mail pour confirmer ton inscription",
+    "signInRequired": "Connecte-toi pour continuer"
+  },
+  "profileEdit": {
+    "title": "Modifier mon profil",
+    "username": "Pseudo",
+    "city": "Ville",
+    "useMyLocation": "📍 Utiliser ma position",
+    "locationSet": "Position enregistrée ({{city}})",
+    "locationDenied": "Accès à la position refusé — saisis ta ville manuellement",
+    "saved": "Profil enregistré ✓",
+    "locationHint": "Ta position sert au tri par distance. Publiquement, seule ta ville est visible."
+  },
+  "sell": {
+    "pickCard": "1. Choisis la carte ou le produit",
+    "details": "2. Détails",
+    "pricing": "3. Prix",
+    "changeCard": "Changer",
+    "price": "Prix (€)",
+    "publish": "Publier l'annonce",
+    "published": "Annonce publiée ✓",
+    "needProfile": "Renseigne d'abord ta ville dans ton profil pour publier une annonce"
+  },
+  "listingDetail": {
+    "seller": "Vendeur",
+    "makeOffer": "Faire une offre",
+    "offerAmount": "Montant proposé (€)",
+    "sendOffer": "Envoyer l'offre",
+    "offerSent": "Offre envoyée ✓",
+    "offers": "Offres reçues",
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "accepted": "acceptée",
+    "declined": "refusée",
+    "pending": "en attente",
+    "messagePlaceholder": "Écris ton message…",
+    "send": "Envoyer",
+    "concludeTrade": "Conclure en main propre",
+    "yourListing": "C'est ton annonce"
+  },
+  "chat": {
+    "placeholder": "Ton message…",
+    "empty": "Démarre la conversation 👋"
+  },
+  "collectionAdd": {
+    "title": "Ajouter à ma collection",
+    "add": "Ajouter",
+    "added": "Ajouté à ta collection ✓",
+    "remove": "Retirer"
+  },
+  "tx": {
+    "title": "Transaction",
+    "myQr": "Ton code de validation",
+    "showQr": "Montre ce code à l'autre partie au rendez-vous",
+    "enterCode": "Code de l'autre partie",
+    "validate": "Valider l'échange",
+    "youValidated": "Tu as validé ✓ — en attente de l'autre partie",
+    "completed": "Échange terminé 🎉 Les deux parties ont validé.",
+    "status": {
+      "pending_payment": "En attente de paiement",
+      "escrowed": "Argent sécurisé — organisez le rendez-vous",
+      "meetup_scheduled": "Rendez-vous prévu",
+      "completed": "Terminée",
+      "disputed": "En litige",
+      "refunded": "Remboursée",
+      "cancelled": "Annulée"
+    }
   }
 }

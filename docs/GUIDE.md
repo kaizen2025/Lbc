@@ -42,8 +42,8 @@ Le projet se construit en **4 phases** :
 
 | Phase | Contenu | État |
 |---|---|---|
-| **1 — Socle marketplace** | Comptes, profils géolocalisés, catalogue de cartes, annonces (vente/échange/recherche), recherche par distance, messagerie, app FR/EN sur iOS + Android + Web | ✅ Socle en place (il reste : écran de connexion, formulaire d'annonce complet) |
-| **2 — Paiement sécurisé** | Paiement Stripe, séquestre, 1 € de frais, double validation QR au rendez-vous, litiges, avis/réputation | ⏳ À venir (les tables en base sont déjà prêtes) |
+| **1 — Socle marketplace** | Comptes, profils géolocalisés, catalogue de cartes, annonces (vente/échange/recherche), recherche par distance, messagerie, app FR/EN sur iOS + Android + Web | ✅ Fonctionnel : connexion/inscription, profil avec position GPS, dépôt d'annonce, fiche annonce, offres, conversations |
+| **2 — Paiement sécurisé** | Paiement Stripe, séquestre, 1 € de frais, double validation QR au rendez-vous, litiges, avis/réputation | 🟡 Démarré : machine à états des transactions + double validation par code au rendez-vous + avis déjà en place (trades sans argent opérationnels) ; il reste le paiement Stripe |
 | **3 — Portfolio & cote** | Collection, prix EU/US automatiques quotidiens, graphiques 1J→MAX, alertes de prix, export CSV | ⏳ À venir (API et base déjà prêtes, données de démo incluses) |
 | **4 — Scan & croissance** | Scanner une carte avec l'appareil photo pour l'identifier, assistant photos d'état, notifications, matching wishlist | ⏳ À venir |
 

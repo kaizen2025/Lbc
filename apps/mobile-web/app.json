@@ -19,7 +19,16 @@
       "bundler": "metro",
       "output": "single"
     },
-    "plugins": ["expo-router", "expo-localization"],
+    "plugins": [
+      "expo-router",
+      "expo-localization",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "CardTrade utilise ta position pour trouver les cartes près de chez toi. Seule ta ville est visible publiquement."
+        }
+      ]
+    ],
     "experiments": {
       "typedRoutes": true
     }

@@ -143,6 +143,75 @@
     "email": "Email",
     "password": "Password",
     "continueWithApple": "Continue with Apple",
-    "continueWithGoogle": "Continue with Google"
+    "continueWithGoogle": "Continue with Google",
+    "noAccount": "No account yet? Create one",
+    "haveAccount": "Already have an account? Sign in",
+    "checkEmail": "Check your inbox to confirm your signup",
+    "signInRequired": "Sign in to continue"
+  },
+  "profileEdit": {
+    "title": "Edit my profile",
+    "username": "Username",
+    "city": "City",
+    "useMyLocation": "📍 Use my location",
+    "locationSet": "Location saved ({{city}})",
+    "locationDenied": "Location access denied — type your city manually",
+    "saved": "Profile saved ✓",
+    "locationHint": "Your location powers distance sorting. Publicly, only your city is visible."
+  },
+  "sell": {
+    "pickCard": "1. Pick the card or product",
+    "details": "2. Details",
+    "pricing": "3. Price",
+    "changeCard": "Change",
+    "price": "Price (€)",
+    "publish": "Publish listing",
+    "published": "Listing published ✓",
+    "needProfile": "Set your city in your profile before publishing a listing"
+  },
+  "listingDetail": {
+    "seller": "Seller",
+    "makeOffer": "Make an offer",
+    "offerAmount": "Offered amount (€)",
+    "sendOffer": "Send offer",
+    "offerSent": "Offer sent ✓",
+    "offers": "Offers received",
+    "accept": "Accept",
+    "decline": "Decline",
+    "accepted": "accepted",
+    "declined": "declined",
+    "pending": "pending",
+    "messagePlaceholder": "Write your message…",
+    "send": "Send",
+    "concludeTrade": "Complete in person",
+    "yourListing": "This is your listing"
+  },
+  "chat": {
+    "placeholder": "Your message…",
+    "empty": "Start the conversation 👋"
+  },
+  "collectionAdd": {
+    "title": "Add to my collection",
+    "add": "Add",
+    "added": "Added to your collection ✓",
+    "remove": "Remove"
+  },
+  "tx": {
+    "title": "Transaction",
+    "myQr": "Your validation code",
+    "showQr": "Show this code to the other party at the meetup",
+    "enterCode": "Other party's code",
+    "validate": "Validate the trade",
+    "youValidated": "You validated ✓ — waiting for the other party",
+    "completed": "Trade complete 🎉 Both parties validated.",
+    "status": {
+      "pending_payment": "Awaiting payment",
+      "escrowed": "Money secured — arrange the meetup",
+      "meetup_scheduled": "Meetup scheduled",
+      "completed": "Completed",
+      "disputed": "In dispute",
+      "refunded": "Refunded",
+      "cancelled": "Cancelled"
+    }
   }
 }

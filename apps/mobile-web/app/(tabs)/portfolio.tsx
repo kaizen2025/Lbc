@@ -85,6 +85,11 @@ export default function PortfolioScreen() {
       </Card>
 
       <SectionTitle>{t("portfolio.mostValuable")}</SectionTitle>
+      <Link href="/collection-add" asChild>
+        <Pressable style={styles.addButton}>
+          <Text style={styles.addButtonText}>+ {t("portfolio.addCard")}</Text>
+        </Pressable>
+      </Link>
       {items.isError && <Muted>{t("auth.signIn")}</Muted>}
       {items.data?.map((item) => (
         <Card key={item.id}>
@@ -127,4 +132,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   proUpsellText: { color: colors.background, fontWeight: "800", fontSize: 15 },
+  addButton: {
+    borderColor: colors.accent,
+    borderWidth: 1,
+    borderRadius: radius.full,
+    paddingVertical: spacing.sm,
+    alignItems: "center",
+  },
+  addButtonText: { color: colors.accent, fontWeight: "700", fontSize: 15 },
 });

@@ -173,6 +173,20 @@ export const cardPriceQuerySchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Transactions (main propre)
+// ---------------------------------------------------------------------------
+
+export const createTransactionSchema = z.object({
+  offerId: z.string().uuid(),
+});
+
+export const validateTradeSchema = z.object({
+  transactionId: z.string().uuid(),
+  /** Code de validation affiché (ou encodé en QR) par l'autre partie. */
+  code: z.string().min(6).max(64),
+});
+
+// ---------------------------------------------------------------------------
 // Avis
 // ---------------------------------------------------------------------------
 

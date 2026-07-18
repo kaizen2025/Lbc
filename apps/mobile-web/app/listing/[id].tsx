@@ -1,0 +1,203 @@
+import { useState } from "react";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import { useTranslation } from "react-i18next";
+import { formatCurrency } from "@cardtrade/i18n";
+import { Card, Muted, Screen, SectionTitle } from "../../src/components/ui";
+import { formStyles } from "../../src/components/forms";
+import { useSession } from "../../src/lib/auth";
+import { trpc } from "../../src/lib/trpc";
+import { colors, spacing } from "../../src/theme";
+
+export default function ListingDetailScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { t, i18n } = useTranslation();
+  const { session } = useSession();
+  const utils = trpc.useUtils();
+
+  const listing = trpc.listings.byId.useQuery({ id: id! }, { enabled: !!id });
+  const me = trpc.profile.me.useQuery(undefined, {
+    retry: false,
+    enabled: !!session,
+  });
+  const isMine =
+    me.data != null && listing.data != null && listing.data.sellerId === me.data.id;
+
+  const offers = trpc.offers.forListing.useQuery(
+    { listingId: id! },
+    { enabled: !!id && !!session },
+  );
+  const [offerAmount, setOfferAmount] = useState("");
+  const [message, setMessage] = useState("");
+
+  const createOffer = trpc.offers.create.useMutation({
+    onSuccess: () => void utils.offers.forListing.invalidate(),
+  });
+  const respondOffer = trpc.offers.respond.useMutation({
+    onSuccess: () => void utils.offers.forListing.invalidate(),
+  });
+  const createTx = trpc.transactions.createFromOffer.useMutation({
+    onSuccess: (tx) => tx && router.push(`/transaction/${tx.id}`),
+  });
+  const sendMessage = trpc.chat.send.useMutation({
+    onSuccess: (created) =>
+      created && router.push(`/conversation/${created.conversationId}`),
+  });
+
+  if (!listing.data) {
+    return (
+      <Screen>
+        <Muted>{listing.isError ? t("common.error") : t("common.loading")}</Muted>
+      </Screen>
+    );
+  }
+
+  const item = listing.data;
+  const title = item.card?.name ?? item.sealedProduct?.name ?? "—";
+
+  return (
+    <Screen>
+      <Text style={styles.title}>{title}</Text>
+      <Card>
+        <Muted>
+          {t(`listing.${item.type}`)}
+          {item.condition ? ` · ${t(`listing.condition.${item.condition}`)}` : ""}
+          {item.cardLanguage ? ` · ${item.cardLanguage.toUpperCase()}` : ""}
+          {item.isFoil ? ` · ${t("listing.foil")}` : ""}
+        </Muted>
+        {item.priceCents != null && (
+          <Text style={styles.price}>
+            {formatCurrency(item.priceCents, item.currency, i18n.language)}
+          </Text>
+        )}
+        <Muted>
+          {t("listingDetail.seller")} : @{item.seller.profile?.username ?? "?"} ·{" "}
+          {item.city ?? "—"}
+        </Muted>
+        <Text style={styles.notice}>{t("listing.handDeliveryOnly")}</Text>
+      </Card>
+
+      {isMine ? (
+        <>
+          <Muted>{t("listingDetail.yourListing")}</Muted>
+          <SectionTitle>{t("listingDetail.offers")}</SectionTitle>
+          {offers.data?.length === 0 && <Muted>—</Muted>}
+          {offers.data?.map((offer) => (
+            <Card key={offer.id}>
+              <Text style={styles.offerAmount}>
+                @{offer.buyer.profile?.username ?? "?"} ·{" "}
+                {offer.amountCents != null
+                  ? formatCurrency(offer.amountCents, item.currency, i18n.language)
+                  : t("listing.trade")}
+              </Text>
+              {offer.message && <Muted>{offer.message}</Muted>}
+              {offer.status === "pending" ? (
+                <View style={styles.row}>
+                  <Pressable
+                    style={[formStyles.cta, styles.flex]}
+                    onPress={() =>
+                      respondOffer.mutate({ offerId: offer.id, action: "accept" })
+                    }
+                  >
+                    <Text style={formStyles.ctaText}>{t("listingDetail.accept")}</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[styles.declineButton, styles.flex]}
+                    onPress={() =>
+                      respondOffer.mutate({ offerId: offer.id, action: "decline" })
+                    }
+                  >
+                    <Text style={styles.declineText}>{t("listingDetail.decline")}</Text>
+                  </Pressable>
+                </View>
+              ) : (
+                <Muted>{t(`listingDetail.${offer.status}` as never)}</Muted>
+              )}
+            </Card>
+          ))}
+        </>
+      ) : session ? (
+        <>
+          <SectionTitle>{t("listingDetail.makeOffer")}</SectionTitle>
+          <Card>
+            <TextInput
+              style={formStyles.input}
+              placeholder={t("listingDetail.offerAmount")}
+              placeholderTextColor={colors.textMuted}
+              keyboardType="decimal-pad"
+              value={offerAmount}
+              onChangeText={setOfferAmount}
+            />
+            <Pressable
+              style={formStyles.cta}
+              disabled={createOffer.isPending}
+              onPress={() => {
+                const cents = Math.round(Number(offerAmount.replace(",", ".")) * 100);
+                createOffer.mutate({
+                  listingId: item.id,
+                  amountCents: Number.isFinite(cents) && cents >= 0 ? cents : 0,
+                  tradeItemIds: [],
+                });
+              }}
+            >
+              <Text style={formStyles.ctaText}>{t("listingDetail.sendOffer")}</Text>
+            </Pressable>
+            {createOffer.isSuccess && <Muted>{t("listingDetail.offerSent")}</Muted>}
+            {createOffer.isError && <Muted>{createOffer.error.message}</Muted>}
+          </Card>
+
+          {offers.data?.some((offer) => offer.status === "accepted") && (
+            <Pressable
+              style={formStyles.cta}
+              onPress={() => {
+                const accepted = offers.data?.find((o) => o.status === "accepted");
+                if (accepted) createTx.mutate({ offerId: accepted.id });
+              }}
+            >
+              <Text style={formStyles.ctaText}>{t("listingDetail.concludeTrade")}</Text>
+            </Pressable>
+          )}
+
+          <SectionTitle>{t("listing.contactSeller")}</SectionTitle>
+          <Card>
+            <TextInput
+              style={formStyles.input}
+              placeholder={t("listingDetail.messagePlaceholder")}
+              placeholderTextColor={colors.textMuted}
+              value={message}
+              onChangeText={setMessage}
+            />
+            <Pressable
+              style={formStyles.cta}
+              disabled={sendMessage.isPending || message.length === 0}
+              onPress={() => sendMessage.mutate({ listingId: item.id, body: message })}
+            >
+              <Text style={formStyles.ctaText}>{t("listingDetail.send")}</Text>
+            </Pressable>
+          </Card>
+        </>
+      ) : (
+        <Card>
+          <Muted>{t("auth.signInRequired")}</Muted>
+        </Card>
+      )}
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  title: { color: colors.text, fontSize: 24, fontWeight: "800" },
+  price: { color: colors.accent, fontSize: 26, fontWeight: "800" },
+  notice: { color: colors.gold, fontSize: 14, fontWeight: "600" },
+  offerAmount: { color: colors.text, fontSize: 16, fontWeight: "700" },
+  row: { flexDirection: "row", gap: spacing.sm },
+  flex: { flex: 1 },
+  declineButton: {
+    borderColor: colors.negative,
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingVertical: spacing.sm + 4,
+    alignItems: "center",
+  },
+  declineText: { color: colors.negative, fontWeight: "700" },
+});

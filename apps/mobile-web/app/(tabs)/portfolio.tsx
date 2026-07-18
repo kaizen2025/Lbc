@@ -137,10 +137,17 @@ export default function PortfolioScreen() {
       {items.isError && <Muted>{t("auth.signIn")}</Muted>}
       {items.data?.map((item) => (
         <Card key={item.id}>
-          <Text style={styles.itemName}>
-            {item.card?.name ?? item.sealedProduct?.name}
-            {item.isFoil ? " · Foil" : ""}
-          </Text>
+          <View style={styles.itemRow}>
+            <Text style={[styles.itemName, styles.itemNameFlex]}>
+              {item.card?.name ?? item.sealedProduct?.name}
+              {item.isFoil ? " ✦" : ""}
+            </Text>
+            {item.valueCents != null && (
+              <Text style={styles.itemValue}>
+                {formatCurrency(item.valueCents, "EUR", i18n.language)}
+              </Text>
+            )}
+          </View>
           <Muted>
             {item.cardLanguage ? `${t("portfolio.cardLanguage")}: ${item.cardLanguage.toUpperCase()} · ` : ""}
             ×{item.quantity}
@@ -169,6 +176,9 @@ const styles = StyleSheet.create({
   rangeText: { color: colors.textMuted, fontWeight: "600", fontSize: 13 },
   rangeTextActive: { color: colors.background, fontWeight: "700", fontSize: 13 },
   itemName: { color: colors.text, fontSize: 16, fontWeight: "600" },
+  itemNameFlex: { flex: 1 },
+  itemRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
+  itemValue: { color: colors.accent, fontSize: 16, fontWeight: "800" },
   proUpsell: {
     backgroundColor: colors.gold,
     borderRadius: radius.full,

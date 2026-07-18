@@ -16,16 +16,48 @@ const RANGE_DAYS: Record<string, number | null> = {
 };
 
 export const collectionRouter = router({
-  list: protectedProcedure.query(({ ctx }) =>
-    ctx.db.query.collectionItems.findMany({
+  list: protectedProcedure.query(async ({ ctx }) => {
+    const items = await ctx.db.query.collectionItems.findMany({
       where: eq(collectionItems.userId, ctx.user.id),
       with: {
         card: { with: { set: { with: { game: true } } } },
         sealedProduct: { with: { set: true } },
       },
       orderBy: desc(collectionItems.createdAt),
-    }),
-  ),
+    });
+    if (items.length === 0) return [];
+
+    // Dernière cote EU connue par item (variante exacte), en une requête.
+    const priced = await ctx.db.execute<{ item_id: string; price_cents: number }>(sql`
+      select ci.id as item_id, lp.price_cents
+      from ${collectionItems} ci
+      join lateral (
+        select ph.price_cents
+        from ${priceHistory} ph
+        where ph.market = 'eu'
+          and (ph.card_id is not distinct from ci.card_id)
+          and (ph.sealed_product_id is not distinct from ci.sealed_product_id)
+          and (ph.card_language is not distinct from ci.card_language)
+          and (ph.condition is not distinct from ci.condition)
+          and ph.is_foil = ci.is_foil
+        order by ph.recorded_at desc, ph.id desc
+        limit 1
+      ) lp on true
+      where ci.user_id = ${ctx.user.id}
+    `);
+    const priceByItem = new Map(priced.map((row) => [row.item_id, row.price_cents]));
+
+    return items
+      .map((item) => {
+        const unitPriceCents = priceByItem.get(item.id) ?? null;
+        return {
+          ...item,
+          unitPriceCents,
+          valueCents: unitPriceCents != null ? unitPriceCents * item.quantity : null,
+        };
+      })
+      .sort((a, b) => (b.valueCents ?? -1) - (a.valueCents ?? -1));
+  }),
 
   add: protectedProcedure
     .input(addCollectionItemSchema)

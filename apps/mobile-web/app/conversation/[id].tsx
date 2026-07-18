@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import { Muted, Screen } from "../../src/components/ui";
 import { formStyles } from "../../src/components/forms";
 import { useSession } from "../../src/lib/auth";
+import { supabase } from "../../src/lib/supabase";
 import { trpc } from "../../src/lib/trpc";
 import { colors, radius, spacing } from "../../src/theme";
 
@@ -29,13 +30,35 @@ export default function ConversationScreen() {
 
   const messages = trpc.chat.messages.useQuery(
     { conversationId: id! },
-    { enabled: !!id && !!session, refetchInterval: 5000 },
+    // Realtime en canal principal, polling 20 s en filet de sécurité.
+    { enabled: !!id && !!session, refetchInterval: 20000 },
   );
   const [draft, setDraft] = useState("");
+
+  // Canal Supabase Realtime : chaque envoi broadcast "msg" → l'autre partie
+  // rafraîchit instantanément (pas d'attente du polling).
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  useEffect(() => {
+    if (!id || !session) return;
+    const channel = supabase
+      .channel(`conv-${id}`)
+      .on("broadcast", { event: "msg" }, () => {
+        void utils.chat.messages.invalidate({ conversationId: id });
+      })
+      .subscribe();
+    channelRef.current = channel;
+    return () => {
+      channelRef.current = null;
+      void supabase.removeChannel(channel);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, session?.user.id]);
+
   const send = trpc.chat.send.useMutation({
     onSuccess: () => {
       setDraft("");
       void utils.chat.messages.invalidate();
+      void channelRef.current?.send({ type: "broadcast", event: "msg", payload: {} });
     },
   });
 

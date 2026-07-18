@@ -33,6 +33,16 @@ export default function ProfileScreen() {
   const deleteAccount = trpc.profile.deleteAccount.useMutation({
     onSuccess: () => void supabase.auth.signOut(),
   });
+  const subStatus = trpc.subscription.status.useQuery(undefined, {
+    retry: false,
+    enabled: !!session,
+  });
+  const cancelSub = trpc.subscription.cancel.useMutation({
+    onSuccess: () => void utils.subscription.status.invalidate(),
+  });
+  const resumeSub = trpc.subscription.resume.useMutation({
+    onSuccess: () => void utils.subscription.status.invalidate(),
+  });
 
   const currentLanguage = normalizeLanguage(i18n.language);
   const nextLanguage = currentLanguage === "fr" ? "en" : "fr";
@@ -65,6 +75,58 @@ export default function ProfileScreen() {
             </Pressable>
           </Link>
         </Card>
+      )}
+
+      {session && subStatus.data && (
+        <>
+          <SectionTitle>{t("sub.title")}</SectionTitle>
+          <Card>
+            <Text style={subStatus.data.isPro ? styles.proTitle : styles.username}>
+              {subStatus.data.isPro ? t("sub.proPlan") : t("sub.freePlan")}
+            </Text>
+            {subStatus.data.subscription && (
+              <Muted>
+                {subStatus.data.subscription.cancelAtPeriodEnd
+                  ? t("sub.endsOn", {
+                      date: new Date(
+                        subStatus.data.subscription.currentPeriodEnd,
+                      ).toLocaleDateString(i18n.language),
+                    })
+                  : t("sub.renewsOn", {
+                      date: new Date(
+                        subStatus.data.subscription.currentPeriodEnd,
+                      ).toLocaleDateString(i18n.language),
+                    })}
+              </Muted>
+            )}
+            {subStatus.data.subscription ? (
+              subStatus.data.subscription.cancelAtPeriodEnd ? (
+                <Pressable
+                  disabled={resumeSub.isPending}
+                  onPress={() => resumeSub.mutate()}
+                >
+                  <Text style={styles.link}>{t("sub.resume")}</Text>
+                </Pressable>
+              ) : (
+                <>
+                  <Pressable
+                    disabled={cancelSub.isPending}
+                    onPress={() => cancelSub.mutate()}
+                  >
+                    <Text style={styles.signOut}>{t("sub.cancel")}</Text>
+                  </Pressable>
+                  <Muted>{t("sub.cancelInfo")}</Muted>
+                </>
+              )
+            ) : (
+              <Link href="/paywall" asChild>
+                <Pressable>
+                  <Text style={styles.link}>{t("sub.upgrade")} →</Text>
+                </Pressable>
+              </Link>
+            )}
+          </Card>
+        </>
       )}
 
       <Link href="/paywall" asChild>
@@ -130,6 +192,11 @@ export default function ProfileScreen() {
       </Link>
       {session && (
         <Card>
+          <Link href="/change-password" asChild>
+            <Pressable>
+              <Text style={styles.link}>{t("password.change")} →</Text>
+            </Pressable>
+          </Link>
           <Pressable onPress={() => void supabase.auth.signOut()}>
             <Text style={styles.signOut}>{t("profile.signOut")}</Text>
           </Pressable>

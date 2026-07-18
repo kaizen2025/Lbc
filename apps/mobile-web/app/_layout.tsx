@@ -63,6 +63,10 @@ export default function RootLayout() {
             <Stack.Screen name="listing/[id]" options={{ title: "" }} />
             <Stack.Screen name="card/[id]" options={{ title: "" }} />
             <Stack.Screen
+              name="change-password"
+              options={{ presentation: "modal", title: t("password.change") }}
+            />
+            <Stack.Screen
               name="legal"
               options={{ presentation: "modal", title: t("legal.title") }}
             />

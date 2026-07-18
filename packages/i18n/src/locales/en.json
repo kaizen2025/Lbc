@@ -192,6 +192,27 @@
     "placeholder": "Your message…",
     "empty": "Start the conversation 👋"
   },
+  "password": {
+    "forgot": "Forgot password?",
+    "resetSent": "Reset email sent — check your inbox",
+    "change": "Change password",
+    "new": "New password",
+    "confirm": "Confirm password",
+    "mismatch": "Passwords don't match",
+    "tooShort": "6 characters minimum",
+    "changed": "Password changed ✓"
+  },
+  "sub": {
+    "title": "My subscription",
+    "freePlan": "Free plan",
+    "proPlan": "CardTrade PRO",
+    "renewsOn": "Renews on {{date}}",
+    "endsOn": "Active until {{date}} (canceled)",
+    "cancel": "Cancel subscription",
+    "cancelInfo": "You keep PRO until the end of the paid period",
+    "resume": "Resume subscription",
+    "upgrade": "Go PRO"
+  },
   "tradeOffer": {
     "propose": "Offer cards from my collection",
     "selected": "{{count}} card(s) offered in trade",

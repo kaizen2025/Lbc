@@ -67,6 +67,20 @@ export default function AuthScreen() {
           </Text>
         </Pressable>
         {message && <Muted>{message}</Muted>}
+        {mode === "signin" && (
+          <Pressable
+            onPress={() => {
+              if (!email) return;
+              void supabase.auth
+                .resetPasswordForEmail(email)
+                .then(({ error }) =>
+                  setMessage(error ? error.message : t("password.resetSent")),
+                );
+            }}
+          >
+            <Text style={styles.switchMode}>{t("password.forgot")}</Text>
+          </Pressable>
+        )}
       </Card>
       <Pressable
         onPress={() => {

@@ -192,6 +192,27 @@
     "placeholder": "Ton message…",
     "empty": "Démarre la conversation 👋"
   },
+  "password": {
+    "forgot": "Mot de passe oublié ?",
+    "resetSent": "Email de réinitialisation envoyé — vérifie ta boîte mail",
+    "change": "Changer le mot de passe",
+    "new": "Nouveau mot de passe",
+    "confirm": "Confirme le mot de passe",
+    "mismatch": "Les deux mots de passe ne correspondent pas",
+    "tooShort": "6 caractères minimum",
+    "changed": "Mot de passe modifié ✓"
+  },
+  "sub": {
+    "title": "Mon abonnement",
+    "freePlan": "Plan Gratuit",
+    "proPlan": "CardTrade PRO",
+    "renewsOn": "Renouvellement le {{date}}",
+    "endsOn": "Actif jusqu'au {{date}} (résilié)",
+    "cancel": "Résilier l'abonnement",
+    "cancelInfo": "Tu gardes le PRO jusqu'à la fin de la période payée",
+    "resume": "Réactiver l'abonnement",
+    "upgrade": "Passer PRO"
+  },
   "tradeOffer": {
     "propose": "Proposer des cartes de ma collection",
     "selected": "{{count}} carte(s) proposée(s) en échange",

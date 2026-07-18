@@ -123,13 +123,29 @@ export const offersRouter = router({
       });
       if (!listing) throw new TRPCError({ code: "NOT_FOUND" });
       const isSeller = listing.sellerId === ctx.user.id;
-      return ctx.db.query.offers.findMany({
+      const rows = await ctx.db.query.offers.findMany({
         where: isSeller
           ? eq(offers.listingId, input.listingId)
           : and(eq(offers.listingId, input.listingId), eq(offers.buyerId, ctx.user.id)),
         with: { buyer: publicUserWith },
         orderBy: desc(offers.createdAt),
       });
+      // Résout les cartes proposées en échange pour l'affichage.
+      const allItemIds = rows.flatMap((offer) => offer.tradeItemIds);
+      const items =
+        allItemIds.length > 0
+          ? await ctx.db.query.collectionItems.findMany({
+              where: inArray(collectionItems.id, allItemIds),
+              with: { card: true, sealedProduct: true },
+            })
+          : [];
+      const itemById = new Map(items.map((item) => [item.id, item]));
+      return rows.map((offer) => ({
+        ...offer,
+        tradeItems: offer.tradeItemIds
+          .map((itemId) => itemById.get(itemId))
+          .filter((item): item is NonNullable<typeof item> => item != null),
+      }));
     }),
 
   mine: protectedProcedure.query(({ ctx }) =>

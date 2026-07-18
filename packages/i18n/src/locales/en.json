@@ -192,6 +192,12 @@
     "placeholder": "Your message…",
     "empty": "Start the conversation 👋"
   },
+  "tradeOffer": {
+    "propose": "Offer cards from my collection",
+    "selected": "{{count}} card(s) offered in trade",
+    "offered": "Cards offered in trade:",
+    "empty": "Add cards to your collection first (Portfolio tab)"
+  },
   "moderation": {
     "report": "🚩 Report this listing",
     "reportSent": "Report sent — thanks, we're on it ✓",

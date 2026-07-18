@@ -37,6 +37,19 @@ export default function ListingDetailScreen() {
   );
   const [offerAmount, setOfferAmount] = useState("");
   const [message, setMessage] = useState("");
+  const [selectedTradeItems, setSelectedTradeItems] = useState<string[]>([]);
+  const myCollection = trpc.collection.list.useQuery(undefined, {
+    retry: false,
+    enabled: !!session && !isMine,
+  });
+
+  function toggleTradeItem(itemId: string) {
+    setSelectedTradeItems((previous) =>
+      previous.includes(itemId)
+        ? previous.filter((id) => id !== itemId)
+        : [...previous, itemId],
+    );
+  }
 
   const createOffer = trpc.offers.create.useMutation({
     onSuccess: () => void utils.offers.forListing.invalidate(),
@@ -110,6 +123,17 @@ export default function ListingDetailScreen() {
                   : t("listing.trade")}
               </Text>
               {offer.message && <Muted>{offer.message}</Muted>}
+              {offer.tradeItems.length > 0 && (
+                <Muted>
+                  {t("tradeOffer.offered")}{" "}
+                  {offer.tradeItems
+                    .map(
+                      (tradeItem) =>
+                        tradeItem.card?.name ?? tradeItem.sealedProduct?.name ?? "?",
+                    )
+                    .join(", ")}
+                </Muted>
+              )}
               {offer.status === "pending" ? (
                 <View style={styles.row}>
                   <Pressable
@@ -148,21 +172,45 @@ export default function ListingDetailScreen() {
               value={offerAmount}
               onChangeText={setOfferAmount}
             />
+            <Text style={styles.tradeTitle}>{t("tradeOffer.propose")}</Text>
+            {myCollection.data?.length === 0 && <Muted>{t("tradeOffer.empty")}</Muted>}
+            <View style={styles.tradeRow}>
+              {myCollection.data?.map((collectionItem) => {
+                const selected = selectedTradeItems.includes(collectionItem.id);
+                return (
+                  <Pressable
+                    key={collectionItem.id}
+                    onPress={() => toggleTradeItem(collectionItem.id)}
+                    style={[styles.tradeChip, selected && styles.tradeChipActive]}
+                  >
+                    <Text style={selected ? styles.tradeChipTextActive : styles.tradeChipText}>
+                      {collectionItem.card?.name ?? collectionItem.sealedProduct?.name}
+                      {collectionItem.isFoil ? " ✦" : ""}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+            {selectedTradeItems.length > 0 && (
+              <Muted>{t("tradeOffer.selected", { count: selectedTradeItems.length })}</Muted>
+            )}
             <Pressable
               style={formStyles.cta}
-              // Jamais d'offre à 0 € par défaut : un montant vide/invalide ne
-              // doit pas court-circuiter le séquestre côté serveur.
+              // Une offre valide contient un montant > 0, des cartes, ou les deux
+              // (jamais 0 € seul : le séquestre ne doit pas être contourné).
               disabled={
                 createOffer.isPending ||
-                !(Math.round(Number(offerAmount.replace(",", ".")) * 100) > 0)
+                (!(Math.round(Number(offerAmount.replace(",", ".")) * 100) > 0) &&
+                  selectedTradeItems.length === 0)
               }
               onPress={() => {
                 const cents = Math.round(Number(offerAmount.replace(",", ".")) * 100);
-                if (!Number.isFinite(cents) || cents <= 0) return;
+                const hasAmount = Number.isFinite(cents) && cents > 0;
+                if (!hasAmount && selectedTradeItems.length === 0) return;
                 createOffer.mutate({
                   listingId: item.id,
-                  amountCents: cents,
-                  tradeItemIds: [],
+                  amountCents: hasAmount ? cents : undefined,
+                  tradeItemIds: selectedTradeItems,
                 });
               }}
             >
@@ -274,6 +322,19 @@ const styles = StyleSheet.create({
   declineText: { color: colors.negative, fontWeight: "700" },
   alertButton: { color: colors.gold, fontSize: 16, fontWeight: "700" },
   reportButton: { color: colors.negative, fontSize: 14, fontWeight: "600" },
+  tradeTitle: { color: colors.text, fontSize: 15, fontWeight: "700" },
+  tradeRow: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
+  tradeChip: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs + 2,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.surfaceBorder,
+    backgroundColor: colors.background,
+  },
+  tradeChipActive: { backgroundColor: colors.accent, borderColor: colors.accent },
+  tradeChipText: { color: colors.textMuted, fontSize: 13, fontWeight: "600" },
+  tradeChipTextActive: { color: colors.background, fontSize: 13, fontWeight: "700" },
   gallery: { flexDirection: "row", gap: spacing.sm },
   photo: { width: 220, height: 220, borderRadius: 12 },
 });

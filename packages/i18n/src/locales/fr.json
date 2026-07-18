@@ -192,6 +192,12 @@
     "placeholder": "Ton message…",
     "empty": "Démarre la conversation 👋"
   },
+  "tradeOffer": {
+    "propose": "Proposer des cartes de ma collection",
+    "selected": "{{count}} carte(s) proposée(s) en échange",
+    "offered": "Cartes proposées en échange :",
+    "empty": "Ajoute d'abord des cartes à ta collection (onglet Portfolio)"
+  },
   "moderation": {
     "report": "🚩 Signaler cette annonce",
     "reportSent": "Signalement envoyé — merci, on regarde ✓",

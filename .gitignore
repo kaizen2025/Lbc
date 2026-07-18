@@ -1,0 +1,27 @@
+# deps
+node_modules/
+.pnpm-store/
+
+# builds
+dist/
+build/
+.expo/
+.expo-shared/
+web-build/
+.turbo/
+*.tsbuildinfo
+
+# env & secrets
+.env
+.env.local
+.env.*.local
+
+# native
+ios/
+android/
+
+# misc
+.DS_Store
+npm-debug.log*
+pnpm-debug.log*
+coverage/

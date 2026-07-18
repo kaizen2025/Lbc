@@ -1,0 +1,90 @@
+{
+  "common": {
+    "appName": "CardTrade",
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "search": "Search",
+    "seeAll": "See all",
+    "km": "km"
+  },
+  "tabs": {
+    "home": "Home",
+    "search": "Search",
+    "sell": "Sell",
+    "messages": "Messages",
+    "portfolio": "Portfolio",
+    "profile": "Profile"
+  },
+  "home": {
+    "nearYou": "Near you",
+    "marketMovers": "Market movers",
+    "justForYou": "Just for you",
+    "distanceAway": "{{distance}} km away"
+  },
+  "search": {
+    "placeholder": "Search a card, a set, a sealed product…",
+    "closestSeller": "Closest seller",
+    "filters": "Filters",
+    "radius": "Radius",
+    "noResults": "No listings in this radius — widen your search"
+  },
+  "listing": {
+    "sale": "For sale",
+    "trade": "Trade",
+    "wanted": "Wanted",
+    "condition": {
+      "near_mint": "Near Mint",
+      "excellent": "Excellent",
+      "good": "Good",
+      "played": "Played",
+      "poor": "Poor"
+    },
+    "foil": "Foil",
+    "quantity": "Quantity",
+    "create": "Post a listing",
+    "makeOffer": "Make an offer",
+    "contactSeller": "Contact",
+    "handDeliveryOnly": "In-person hand-off only — no shipping"
+  },
+  "transaction": {
+    "escrowNotice": "Your money is held safely by CardTrade until the in-person hand-off",
+    "fee": "Service fee: {{fee}}",
+    "scanQr": "Scan the other party's QR code to validate the trade",
+    "completed": "Trade validated — funds have been released",
+    "meetInPublic": "Tip: meet in a public place"
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "totalValue": "Total value",
+    "last30Days": "{{amount}} in the last 30 days",
+    "mostValuable": "Most valuable",
+    "euMarket": "EU market price",
+    "usMarket": "US / international price",
+    "marketGap": "EU/US gap: {{gap}}",
+    "addCard": "Add a card",
+    "cardLanguage": "Card language",
+    "forTrade": "For trade",
+    "forSale": "For sale",
+    "export": "Export (CSV)"
+  },
+  "profile": {
+    "trades": "{{count}} validated trades",
+    "memberSince": "Member since {{date}}",
+    "myListings": "My listings",
+    "settings": "Settings",
+    "language": "App language",
+    "signOut": "Sign out"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signUp": "Create account",
+    "email": "Email",
+    "password": "Password",
+    "continueWithApple": "Continue with Apple",
+    "continueWithGoogle": "Continue with Google"
+  }
+}

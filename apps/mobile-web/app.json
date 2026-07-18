@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "CardTrade",
+    "slug": "cardtrade",
+    "version": "0.1.0",
+    "scheme": "cardtrade",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0B0F0E",
+    "platforms": ["ios", "android", "web"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "app.cardtrade.mobile"
+    },
+    "android": {
+      "package": "app.cardtrade.mobile"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": ["expo-router", "expo-localization"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

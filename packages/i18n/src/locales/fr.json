@@ -1,0 +1,90 @@
+{
+  "common": {
+    "appName": "CardTrade",
+    "loading": "Chargement…",
+    "error": "Une erreur est survenue",
+    "retry": "Réessayer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "search": "Rechercher",
+    "seeAll": "Tout voir",
+    "km": "km"
+  },
+  "tabs": {
+    "home": "Accueil",
+    "search": "Recherche",
+    "sell": "Vendre",
+    "messages": "Messages",
+    "portfolio": "Portfolio",
+    "profile": "Profil"
+  },
+  "home": {
+    "nearYou": "Près de chez toi",
+    "marketMovers": "Tendances du marché",
+    "justForYou": "Pour toi",
+    "distanceAway": "à {{distance}} km"
+  },
+  "search": {
+    "placeholder": "Cherche une carte, un set, un produit scellé…",
+    "closestSeller": "Vendeur le plus proche",
+    "filters": "Filtres",
+    "radius": "Rayon",
+    "noResults": "Aucune annonce dans ce rayon — élargis ta recherche"
+  },
+  "listing": {
+    "sale": "Vente",
+    "trade": "Échange",
+    "wanted": "Recherche",
+    "condition": {
+      "near_mint": "Near Mint",
+      "excellent": "Excellent",
+      "good": "Bon état",
+      "played": "Joué",
+      "poor": "Abîmé"
+    },
+    "foil": "Foil",
+    "quantity": "Quantité",
+    "create": "Déposer une annonce",
+    "makeOffer": "Faire une offre",
+    "contactSeller": "Contacter",
+    "handDeliveryOnly": "Remise en main propre uniquement — aucun envoi"
+  },
+  "transaction": {
+    "escrowNotice": "L'argent est sécurisé par CardTrade jusqu'à la remise en main propre",
+    "fee": "Frais de service : {{fee}}",
+    "scanQr": "Scanne le QR code de l'autre partie pour valider l'échange",
+    "completed": "Échange validé — les fonds ont été transférés",
+    "meetInPublic": "Conseil : donnez-vous rendez-vous dans un lieu public"
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "totalValue": "Valeur totale",
+    "last30Days": "{{amount}} sur les 30 derniers jours",
+    "mostValuable": "Les plus précieuses",
+    "euMarket": "Cote Europe",
+    "usMarket": "Cote US / internationale",
+    "marketGap": "Écart EU/US : {{gap}}",
+    "addCard": "Ajouter une carte",
+    "cardLanguage": "Langue de la carte",
+    "forTrade": "À échanger",
+    "forSale": "À vendre",
+    "export": "Exporter (CSV)"
+  },
+  "profile": {
+    "trades": "{{count}} échanges validés",
+    "memberSince": "Membre depuis {{date}}",
+    "myListings": "Mes annonces",
+    "settings": "Réglages",
+    "language": "Langue de l'application",
+    "signOut": "Se déconnecter"
+  },
+  "auth": {
+    "signIn": "Se connecter",
+    "signUp": "Créer un compte",
+    "email": "Email",
+    "password": "Mot de passe",
+    "continueWithApple": "Continuer avec Apple",
+    "continueWithGoogle": "Continuer avec Google"
+  }
+}

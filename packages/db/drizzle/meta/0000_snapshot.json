@@ -1,12 +1,12 @@
 {
-  "id": "8578b6f1-dcd4-4260-b5a0-2b6b14a6425e",
+  "id": "cc07e0ba-9d59-437c-add2-70a60787b0f1",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.alerts": {
+    "cardtrade.alerts": {
       "name": "alerts",
-      "schema": "",
+      "schema": "cardtrade",
       "columns": {
         "id": {
           "name": "id",
@@ -36,7 +36,7 @@
         "card_language": {
           "name": "card_language",
           "type": "card_language",
-          "typeSchema": "public",
+          "typeSchema": "cardtrade",
           "primaryKey": false,
           "notNull": false
         },
@@ -95,6 +95,7 @@
           "name": "alerts_user_id_users_id_fk",
           "tableFrom": "alerts",
           "tableTo": "users",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "user_id"
           ],
@@ -108,6 +109,7 @@
           "name": "alerts_card_id_cards_id_fk",
           "tableFrom": "alerts",
           "tableTo": "cards",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "card_id"
           ],
@@ -121,6 +123,7 @@
           "name": "alerts_sealed_product_id_sealed_products_id_fk",
           "tableFrom": "alerts",
           "tableTo": "sealed_products",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "sealed_product_id"
           ],
@@ -137,9 +140,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.cards": {
+    "cardtrade.cards": {
       "name": "cards",
-      "schema": "",
+      "schema": "cardtrade",
       "columns": {
         "id": {
           "name": "id",
@@ -221,6 +224,7 @@
           "name": "cards_set_id_sets_id_fk",
           "tableFrom": "cards",
           "tableTo": "sets",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "set_id"
           ],
@@ -237,9 +241,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.collection_items": {
+    "cardtrade.collection_items": {
       "name": "collection_items",
-      "schema": "",
+      "schema": "cardtrade",
       "columns": {
         "id": {
           "name": "id",
@@ -269,14 +273,14 @@
         "card_language": {
           "name": "card_language",
           "type": "card_language",
-          "typeSchema": "public",
+          "typeSchema": "cardtrade",
           "primaryKey": false,
           "notNull": false
         },
         "condition": {
           "name": "condition",
           "type": "card_condition",
-          "typeSchema": "public",
+          "typeSchema": "cardtrade",
           "primaryKey": false,
           "notNull": false
         },
@@ -344,6 +348,7 @@
           "name": "collection_items_user_id_users_id_fk",
           "tableFrom": "collection_items",
           "tableTo": "users",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "user_id"
           ],
@@ -357,6 +362,7 @@
           "name": "collection_items_card_id_cards_id_fk",
           "tableFrom": "collection_items",
           "tableTo": "cards",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "card_id"
           ],
@@ -370,6 +376,7 @@
           "name": "collection_items_sealed_product_id_sealed_products_id_fk",
           "tableFrom": "collection_items",
           "tableTo": "sealed_products",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "sealed_product_id"
           ],
@@ -386,9 +393,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.conversation_participants": {
+    "cardtrade.conversation_participants": {
       "name": "conversation_participants",
-      "schema": "",
+      "schema": "cardtrade",
       "columns": {
         "conversation_id": {
           "name": "conversation_id",
@@ -409,6 +416,7 @@
           "name": "conversation_participants_conversation_id_conversations_id_fk",
           "tableFrom": "conversation_participants",
           "tableTo": "conversations",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "conversation_id"
           ],
@@ -422,6 +430,7 @@
           "name": "conversation_participants_user_id_users_id_fk",
           "tableFrom": "conversation_participants",
           "tableTo": "users",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "user_id"
           ],
@@ -446,9 +455,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.conversations": {
+    "cardtrade.conversations": {
       "name": "conversations",
-      "schema": "",
+      "schema": "cardtrade",
       "columns": {
         "id": {
           "name": "id",
@@ -477,6 +486,7 @@
           "name": "conversations_listing_id_listings_id_fk",
           "tableFrom": "conversations",
           "tableTo": "listings",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "listing_id"
           ],
@@ -493,9 +503,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.disputes": {
+    "cardtrade.disputes": {
       "name": "disputes",
-      "schema": "",
+      "schema": "cardtrade",
       "columns": {
         "id": {
           "name": "id",
@@ -525,7 +535,7 @@
         "status": {
           "name": "status",
           "type": "dispute_status",
-          "typeSchema": "public",
+          "typeSchema": "cardtrade",
           "primaryKey": false,
           "notNull": true,
           "default": "'open'"
@@ -550,6 +560,7 @@
           "name": "disputes_transaction_id_transactions_id_fk",
           "tableFrom": "disputes",
           "tableTo": "transactions",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "transaction_id"
           ],
@@ -563,6 +574,7 @@
           "name": "disputes_opened_by_id_users_id_fk",
           "tableFrom": "disputes",
           "tableTo": "users",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "opened_by_id"
           ],
@@ -579,9 +591,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.games": {
+    "cardtrade.games": {
       "name": "games",
-      "schema": "",
+      "schema": "cardtrade",
       "columns": {
         "id": {
           "name": "id",
@@ -624,9 +636,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.listings": {
+    "cardtrade.listings": {
       "name": "listings",
-      "schema": "",
+      "schema": "cardtrade",
       "columns": {
         "id": {
           "name": "id",
@@ -644,14 +656,14 @@
         "type": {
           "name": "type",
           "type": "listing_type",
-          "typeSchema": "public",
+          "typeSchema": "cardtrade",
           "primaryKey": false,
           "notNull": true
         },
         "status": {
           "name": "status",
           "type": "listing_status",
-          "typeSchema": "public",
+          "typeSchema": "cardtrade",
           "primaryKey": false,
           "notNull": true,
           "default": "'active'"
@@ -671,14 +683,14 @@
         "card_language": {
           "name": "card_language",
           "type": "card_language",
-          "typeSchema": "public",
+          "typeSchema": "cardtrade",
           "primaryKey": false,
           "notNull": false
         },
         "condition": {
           "name": "condition",
           "type": "card_condition",
-          "typeSchema": "public",
+          "typeSchema": "cardtrade",
           "primaryKey": false,
           "notNull": false
         },
@@ -705,7 +717,7 @@
         "currency": {
           "name": "currency",
           "type": "currency",
-          "typeSchema": "public",
+          "typeSchema": "cardtrade",
           "primaryKey": false,
           "notNull": true,
           "default": "'EUR'"
@@ -820,6 +832,7 @@
           "name": "listings_seller_id_users_id_fk",
           "tableFrom": "listings",
           "tableTo": "users",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "seller_id"
           ],
@@ -833,6 +846,7 @@
           "name": "listings_card_id_cards_id_fk",
           "tableFrom": "listings",
           "tableTo": "cards",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "card_id"
           ],
@@ -846,6 +860,7 @@
           "name": "listings_sealed_product_id_sealed_products_id_fk",
           "tableFrom": "listings",
           "tableTo": "sealed_products",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "sealed_product_id"
           ],
@@ -862,9 +877,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.messages": {
+    "cardtrade.messages": {
       "name": "messages",
-      "schema": "",
+      "schema": "cardtrade",
       "columns": {
         "id": {
           "name": "id",
@@ -933,6 +948,7 @@
           "name": "messages_conversation_id_conversations_id_fk",
           "tableFrom": "messages",
           "tableTo": "conversations",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "conversation_id"
           ],
@@ -946,6 +962,7 @@
           "name": "messages_sender_id_users_id_fk",
           "tableFrom": "messages",
           "tableTo": "users",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "sender_id"
           ],
@@ -962,9 +979,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.offers": {
+    "cardtrade.offers": {
       "name": "offers",
-      "schema": "",
+      "schema": "cardtrade",
       "columns": {
         "id": {
           "name": "id",
@@ -988,7 +1005,7 @@
         "status": {
           "name": "status",
           "type": "offer_status",
-          "typeSchema": "public",
+          "typeSchema": "cardtrade",
           "primaryKey": false,
           "notNull": true,
           "default": "'pending'"
@@ -1054,6 +1071,7 @@
           "name": "offers_listing_id_listings_id_fk",
           "tableFrom": "offers",
           "tableTo": "listings",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "listing_id"
           ],
@@ -1067,6 +1085,7 @@
           "name": "offers_buyer_id_users_id_fk",
           "tableFrom": "offers",
           "tableTo": "users",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "buyer_id"
           ],
@@ -1083,9 +1102,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.price_history": {
+    "cardtrade.price_history": {
       "name": "price_history",
-      "schema": "",
+      "schema": "cardtrade",
       "columns": {
         "id": {
           "name": "id",
@@ -1108,14 +1127,14 @@
         "card_language": {
           "name": "card_language",
           "type": "card_language",
-          "typeSchema": "public",
+          "typeSchema": "cardtrade",
           "primaryKey": false,
           "notNull": false
         },
         "condition": {
           "name": "condition",
           "type": "card_condition",
-          "typeSchema": "public",
+          "typeSchema": "cardtrade",
           "primaryKey": false,
           "notNull": false
         },
@@ -1129,14 +1148,14 @@
         "market": {
           "name": "market",
           "type": "market",
-          "typeSchema": "public",
+          "typeSchema": "cardtrade",
           "primaryKey": false,
           "notNull": true
         },
         "currency": {
           "name": "currency",
           "type": "currency",
-          "typeSchema": "public",
+          "typeSchema": "cardtrade",
           "primaryKey": false,
           "notNull": true
         },
@@ -1238,6 +1257,7 @@
           "name": "price_history_card_id_cards_id_fk",
           "tableFrom": "price_history",
           "tableTo": "cards",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "card_id"
           ],
@@ -1251,6 +1271,7 @@
           "name": "price_history_sealed_product_id_sealed_products_id_fk",
           "tableFrom": "price_history",
           "tableTo": "sealed_products",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "sealed_product_id"
           ],
@@ -1267,9 +1288,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.profiles": {
+    "cardtrade.profiles": {
       "name": "profiles",
-      "schema": "",
+      "schema": "cardtrade",
       "columns": {
         "user_id": {
           "name": "user_id",
@@ -1395,6 +1416,7 @@
           "name": "profiles_user_id_users_id_fk",
           "tableFrom": "profiles",
           "tableTo": "users",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "user_id"
           ],
@@ -1419,9 +1441,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.reviews": {
+    "cardtrade.reviews": {
       "name": "reviews",
-      "schema": "",
+      "schema": "cardtrade",
       "columns": {
         "id": {
           "name": "id",
@@ -1496,6 +1518,7 @@
           "name": "reviews_transaction_id_transactions_id_fk",
           "tableFrom": "reviews",
           "tableTo": "transactions",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "transaction_id"
           ],
@@ -1509,6 +1532,7 @@
           "name": "reviews_reviewer_id_users_id_fk",
           "tableFrom": "reviews",
           "tableTo": "users",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "reviewer_id"
           ],
@@ -1522,6 +1546,7 @@
           "name": "reviews_reviewee_id_users_id_fk",
           "tableFrom": "reviews",
           "tableTo": "users",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "reviewee_id"
           ],
@@ -1538,9 +1563,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.sealed_products": {
+    "cardtrade.sealed_products": {
       "name": "sealed_products",
-      "schema": "",
+      "schema": "cardtrade",
       "columns": {
         "id": {
           "name": "id",
@@ -1601,6 +1626,7 @@
           "name": "sealed_products_set_id_sets_id_fk",
           "tableFrom": "sealed_products",
           "tableTo": "sets",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "set_id"
           ],
@@ -1617,9 +1643,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.sets": {
+    "cardtrade.sets": {
       "name": "sets",
-      "schema": "",
+      "schema": "cardtrade",
       "columns": {
         "id": {
           "name": "id",
@@ -1686,6 +1712,7 @@
           "name": "sets_game_id_games_id_fk",
           "tableFrom": "sets",
           "tableTo": "games",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "game_id"
           ],
@@ -1702,9 +1729,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.trade_validations": {
+    "cardtrade.trade_validations": {
       "name": "trade_validations",
-      "schema": "",
+      "schema": "cardtrade",
       "columns": {
         "id": {
           "name": "id",
@@ -1766,6 +1793,7 @@
           "name": "trade_validations_transaction_id_transactions_id_fk",
           "tableFrom": "trade_validations",
           "tableTo": "transactions",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "transaction_id"
           ],
@@ -1779,6 +1807,7 @@
           "name": "trade_validations_user_id_users_id_fk",
           "tableFrom": "trade_validations",
           "tableTo": "users",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "user_id"
           ],
@@ -1803,9 +1832,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.transactions": {
+    "cardtrade.transactions": {
       "name": "transactions",
-      "schema": "",
+      "schema": "cardtrade",
       "columns": {
         "id": {
           "name": "id",
@@ -1841,7 +1870,7 @@
         "status": {
           "name": "status",
           "type": "transaction_status",
-          "typeSchema": "public",
+          "typeSchema": "cardtrade",
           "primaryKey": false,
           "notNull": true,
           "default": "'pending_payment'"
@@ -1862,7 +1891,7 @@
         "currency": {
           "name": "currency",
           "type": "currency",
-          "typeSchema": "public",
+          "typeSchema": "cardtrade",
           "primaryKey": false,
           "notNull": true,
           "default": "'EUR'"
@@ -1942,6 +1971,7 @@
           "name": "transactions_listing_id_listings_id_fk",
           "tableFrom": "transactions",
           "tableTo": "listings",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "listing_id"
           ],
@@ -1955,6 +1985,7 @@
           "name": "transactions_offer_id_offers_id_fk",
           "tableFrom": "transactions",
           "tableTo": "offers",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "offer_id"
           ],
@@ -1968,6 +1999,7 @@
           "name": "transactions_buyer_id_users_id_fk",
           "tableFrom": "transactions",
           "tableTo": "users",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "buyer_id"
           ],
@@ -1981,6 +2013,7 @@
           "name": "transactions_seller_id_users_id_fk",
           "tableFrom": "transactions",
           "tableTo": "users",
+          "schemaTo": "cardtrade",
           "columnsFrom": [
             "seller_id"
           ],
@@ -1997,9 +2030,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.users": {
+    "cardtrade.users": {
       "name": "users",
-      "schema": "",
+      "schema": "cardtrade",
       "columns": {
         "id": {
           "name": "id",
@@ -2039,9 +2072,9 @@
     }
   },
   "enums": {
-    "public.card_condition": {
+    "cardtrade.card_condition": {
       "name": "card_condition",
-      "schema": "public",
+      "schema": "cardtrade",
       "values": [
         "near_mint",
         "excellent",
@@ -2050,9 +2083,9 @@
         "poor"
       ]
     },
-    "public.card_language": {
+    "cardtrade.card_language": {
       "name": "card_language",
-      "schema": "public",
+      "schema": "cardtrade",
       "values": [
         "en",
         "fr",
@@ -2065,26 +2098,26 @@
         "ko"
       ]
     },
-    "public.currency": {
+    "cardtrade.currency": {
       "name": "currency",
-      "schema": "public",
+      "schema": "cardtrade",
       "values": [
         "EUR",
         "USD"
       ]
     },
-    "public.dispute_status": {
+    "cardtrade.dispute_status": {
       "name": "dispute_status",
-      "schema": "public",
+      "schema": "cardtrade",
       "values": [
         "open",
         "resolved_refund",
         "resolved_release"
       ]
     },
-    "public.listing_status": {
+    "cardtrade.listing_status": {
       "name": "listing_status",
-      "schema": "public",
+      "schema": "cardtrade",
       "values": [
         "active",
         "reserved",
@@ -2092,26 +2125,26 @@
         "cancelled"
       ]
     },
-    "public.listing_type": {
+    "cardtrade.listing_type": {
       "name": "listing_type",
-      "schema": "public",
+      "schema": "cardtrade",
       "values": [
         "sale",
         "trade",
         "wanted"
       ]
     },
-    "public.market": {
+    "cardtrade.market": {
       "name": "market",
-      "schema": "public",
+      "schema": "cardtrade",
       "values": [
         "eu",
         "us"
       ]
     },
-    "public.offer_status": {
+    "cardtrade.offer_status": {
       "name": "offer_status",
-      "schema": "public",
+      "schema": "cardtrade",
       "values": [
         "pending",
         "accepted",
@@ -2120,9 +2153,9 @@
         "withdrawn"
       ]
     },
-    "public.transaction_status": {
+    "cardtrade.transaction_status": {
       "name": "transaction_status",
-      "schema": "public",
+      "schema": "cardtrade",
       "values": [
         "pending_payment",
         "escrowed",
@@ -2134,7 +2167,9 @@
       ]
     }
   },
-  "schemas": {},
+  "schemas": {
+    "cardtrade": "cardtrade"
+  },
   "sequences": {},
   "roles": {},
   "policies": {},

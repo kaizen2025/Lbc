@@ -5,8 +5,7 @@ import {
   index,
   integer,
   jsonb,
-  pgEnum,
-  pgTable,
+  pgSchema,
   primaryKey,
   serial,
   text,
@@ -16,12 +15,19 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 
+/**
+ * Toutes les tables CardTrade vivent dans le schéma PostgreSQL "cardtrade",
+ * isolé du schéma "public" (partage du projet Supabase New-Life sans collision,
+ * et non exposé par l'API REST publique de Supabase).
+ */
+export const cardtradeSchema = pgSchema("cardtrade");
+
 // ---------------------------------------------------------------------------
 // Enums
 // ---------------------------------------------------------------------------
 
 /** Langue d'impression de la carte — donnée métier distincte de la langue de l'UI. */
-export const cardLanguageEnum = pgEnum("card_language", [
+export const cardLanguageEnum = cardtradeSchema.enum("card_language", [
   "en",
   "fr",
   "ja",
@@ -33,7 +39,7 @@ export const cardLanguageEnum = pgEnum("card_language", [
   "ko",
 ]);
 
-export const cardConditionEnum = pgEnum("card_condition", [
+export const cardConditionEnum = cardtradeSchema.enum("card_condition", [
   "near_mint",
   "excellent",
   "good",
@@ -41,16 +47,16 @@ export const cardConditionEnum = pgEnum("card_condition", [
   "poor",
 ]);
 
-export const listingTypeEnum = pgEnum("listing_type", ["sale", "trade", "wanted"]);
+export const listingTypeEnum = cardtradeSchema.enum("listing_type", ["sale", "trade", "wanted"]);
 
-export const listingStatusEnum = pgEnum("listing_status", [
+export const listingStatusEnum = cardtradeSchema.enum("listing_status", [
   "active",
   "reserved",
   "completed",
   "cancelled",
 ]);
 
-export const offerStatusEnum = pgEnum("offer_status", [
+export const offerStatusEnum = cardtradeSchema.enum("offer_status", [
   "pending",
   "accepted",
   "declined",
@@ -62,7 +68,7 @@ export const offerStatusEnum = pgEnum("offer_status", [
  * Machine à états d'une transaction séquestrée. Les transitions ne sont
  * autorisées QUE côté serveur (packages/api/src/services/transactions.ts).
  */
-export const transactionStatusEnum = pgEnum("transaction_status", [
+export const transactionStatusEnum = cardtradeSchema.enum("transaction_status", [
   "pending_payment",
   "escrowed",
   "meetup_scheduled",
@@ -73,11 +79,11 @@ export const transactionStatusEnum = pgEnum("transaction_status", [
 ]);
 
 /** Marché de cotation : Europe (Cardmarket) vs international/US (eBay, TCGplayer). */
-export const marketEnum = pgEnum("market", ["eu", "us"]);
+export const marketEnum = cardtradeSchema.enum("market", ["eu", "us"]);
 
-export const currencyEnum = pgEnum("currency", ["EUR", "USD"]);
+export const currencyEnum = cardtradeSchema.enum("currency", ["EUR", "USD"]);
 
-export const disputeStatusEnum = pgEnum("dispute_status", [
+export const disputeStatusEnum = cardtradeSchema.enum("dispute_status", [
   "open",
   "resolved_refund",
   "resolved_release",
@@ -87,14 +93,14 @@ export const disputeStatusEnum = pgEnum("dispute_status", [
 // Utilisateurs & profils
 // ---------------------------------------------------------------------------
 
-export const users = pgTable("users", {
+export const users = cardtradeSchema.table("users", {
   /** Aligné sur l'UID Supabase Auth. */
   id: uuid("id").primaryKey(),
   email: text("email").notNull().unique(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const profiles = pgTable(
+export const profiles = cardtradeSchema.table(
   "profiles",
   {
     userId: uuid("user_id")
@@ -124,14 +130,14 @@ export const profiles = pgTable(
 // Catalogue canonique (jeux → sets → cartes / produits scellés)
 // ---------------------------------------------------------------------------
 
-export const games = pgTable("games", {
+export const games = cardtradeSchema.table("games", {
   id: serial("id").primaryKey(),
   slug: text("slug").notNull().unique(),
   name: text("name").notNull(),
   iconUrl: text("icon_url"),
 });
 
-export const sets = pgTable(
+export const sets = cardtradeSchema.table(
   "sets",
   {
     id: serial("id").primaryKey(),
@@ -146,7 +152,7 @@ export const sets = pgTable(
   (t) => [uniqueIndex("sets_game_code_uq").on(t.gameId, t.code)],
 );
 
-export const cards = pgTable(
+export const cards = cardtradeSchema.table(
   "cards",
   {
     id: serial("id").primaryKey(),
@@ -166,7 +172,7 @@ export const cards = pgTable(
 );
 
 /** Produits scellés (boosters, displays, coffrets) — cotés et échangeables aussi. */
-export const sealedProducts = pgTable(
+export const sealedProducts = cardtradeSchema.table(
   "sealed_products",
   {
     id: serial("id").primaryKey(),
@@ -184,7 +190,7 @@ export const sealedProducts = pgTable(
 // Cote & historique de prix — par carte × langue × état × foil × marché
 // ---------------------------------------------------------------------------
 
-export const priceHistory = pgTable(
+export const priceHistory = cardtradeSchema.table(
   "price_history",
   {
     id: serial("id").primaryKey(),
@@ -219,7 +225,7 @@ export const priceHistory = pgTable(
 // Collections
 // ---------------------------------------------------------------------------
 
-export const collectionItems = pgTable(
+export const collectionItems = cardtradeSchema.table(
   "collection_items",
   {
     id: uuid("id").primaryKey().defaultRandom(),
@@ -246,7 +252,7 @@ export const collectionItems = pgTable(
 // Annonces (vente / échange / recherche)
 // ---------------------------------------------------------------------------
 
-export const listings = pgTable(
+export const listings = cardtradeSchema.table(
   "listings",
   {
     id: uuid("id").primaryKey().defaultRandom(),
@@ -285,7 +291,7 @@ export const listings = pgTable(
 // Offres & négociation
 // ---------------------------------------------------------------------------
 
-export const offers = pgTable(
+export const offers = cardtradeSchema.table(
   "offers",
   {
     id: uuid("id").primaryKey().defaultRandom(),
@@ -310,13 +316,13 @@ export const offers = pgTable(
 // Messagerie
 // ---------------------------------------------------------------------------
 
-export const conversations = pgTable("conversations", {
+export const conversations = cardtradeSchema.table("conversations", {
   id: uuid("id").primaryKey().defaultRandom(),
   listingId: uuid("listing_id").references(() => listings.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const conversationParticipants = pgTable(
+export const conversationParticipants = cardtradeSchema.table(
   "conversation_participants",
   {
     conversationId: uuid("conversation_id")
@@ -329,7 +335,7 @@ export const conversationParticipants = pgTable(
   (t) => [primaryKey({ columns: [t.conversationId, t.userId] })],
 );
 
-export const messages = pgTable(
+export const messages = cardtradeSchema.table(
   "messages",
   {
     id: uuid("id").primaryKey().defaultRandom(),
@@ -350,7 +356,7 @@ export const messages = pgTable(
 // Transactions séquestrées & validation en main propre
 // ---------------------------------------------------------------------------
 
-export const transactions = pgTable(
+export const transactions = cardtradeSchema.table(
   "transactions",
   {
     id: uuid("id").primaryKey().defaultRandom(),
@@ -384,7 +390,7 @@ export const transactions = pgTable(
 );
 
 /** Double validation au RDV : chaque partie scanne le QR de l'autre. */
-export const tradeValidations = pgTable(
+export const tradeValidations = cardtradeSchema.table(
   "trade_validations",
   {
     id: uuid("id").primaryKey().defaultRandom(),
@@ -400,7 +406,7 @@ export const tradeValidations = pgTable(
   (t) => [uniqueIndex("validation_tx_user_uq").on(t.transactionId, t.userId)],
 );
 
-export const reviews = pgTable(
+export const reviews = cardtradeSchema.table(
   "reviews",
   {
     id: uuid("id").primaryKey().defaultRandom(),
@@ -420,7 +426,7 @@ export const reviews = pgTable(
   (t) => [uniqueIndex("reviews_tx_reviewer_uq").on(t.transactionId, t.reviewerId)],
 );
 
-export const disputes = pgTable("disputes", {
+export const disputes = cardtradeSchema.table("disputes", {
   id: uuid("id").primaryKey().defaultRandom(),
   transactionId: uuid("transaction_id")
     .notNull()
@@ -438,7 +444,7 @@ export const disputes = pgTable("disputes", {
 // Alertes ("préviens-moi si cette carte apparaît à moins de X km / X €")
 // ---------------------------------------------------------------------------
 
-export const alerts = pgTable(
+export const alerts = cardtradeSchema.table(
   "alerts",
   {
     id: uuid("id").primaryKey().defaultRandom(),

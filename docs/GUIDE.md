@@ -149,21 +149,24 @@ pnpm install
 
 ### Configurer la base de données (une seule fois)
 
-1. Créer un compte gratuit sur [supabase.com](https://supabase.com) → « New project ».
-2. Dans le projet Supabase : **Settings → Database → Connection string** → copier l'URL
-   (elle ressemble à `postgres://postgres:...@db.xxxx.supabase.co:5432/postgres`).
-3. À la racine du projet :
-   ```bash
-   cp .env.example .env
-   ```
-   puis ouvrir `.env` et remplir :
-   - `DATABASE_URL=` → l'URL copiée à l'étape 2
-   - `SUPABASE_URL=` et `SUPABASE_ANON_KEY=` → dans **Settings → API** du projet Supabase
-4. Créer les tables et les données de démo :
-   ```bash
-   pnpm db:migrate   # crée les 18 tables
-   pnpm db:seed      # ajoute Pokémon 151 + Riftbound Origins + 30 jours de prix EU/US
-   ```
+**La base existe déjà** : les 18 tables CardTrade sont installées dans le **schéma
+`cardtrade`** du projet Supabase existant (isolé du reste du projet, non exposé par
+l'API publique), avec les données de démo déjà chargées (Pokémon 151, Riftbound Origins,
+30 jours de prix EU/US).
+
+Il ne reste qu'à créer ton fichier de configuration :
+
+```bash
+cp .env.example .env
+```
+
+puis ouvrir `.env` : les URL et clés Supabase sont **déjà pré-remplies**. Il manque
+uniquement le **mot de passe de la base** dans `DATABASE_URL` (remplacer
+`<MOT_DE_PASSE>`) — demande-le à Kevin, ou récupère-le dans le dashboard Supabase
+(**Settings → Database**, bouton « Reset database password »).
+
+> Si un jour on modifie les tables (`schema.ts`) : `pnpm db:generate` puis
+> `pnpm db:migrate` applique les changements. `pnpm db:seed` recharge la démo.
 
 ### Lancer (à chaque session de travail)
 

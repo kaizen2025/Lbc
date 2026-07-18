@@ -9,6 +9,7 @@ import {
 } from "@cardtrade/db";
 import { sendMessageSchema } from "@cardtrade/validators";
 import { protectedProcedure, router } from "../trpc.js";
+import { publicUserWith } from "../lib/publicProfile.js";
 
 async function assertParticipant(
   ctx: { db: import("@cardtrade/db").Database },
@@ -36,7 +37,7 @@ export const chatRouter = router({
       where: inArray(conversations.id, ids),
       with: {
         listing: { with: { card: true, sealedProduct: true } },
-        participants: { with: { user: { with: { profile: true } } } },
+        participants: { with: { user: publicUserWith } },
         messages: { orderBy: desc(messages.createdAt), limit: 1 },
       },
       orderBy: desc(conversations.createdAt),
@@ -47,11 +48,13 @@ export const chatRouter = router({
     .input(z.object({ conversationId: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
       await assertParticipant(ctx, input.conversationId, ctx.user.id);
-      return ctx.db.query.messages.findMany({
+      // Les 200 PLUS RÉCENTS (desc), remis en ordre chronologique pour le fil.
+      const recent = await ctx.db.query.messages.findMany({
         where: eq(messages.conversationId, input.conversationId),
-        orderBy: asc(messages.createdAt),
+        orderBy: desc(messages.createdAt),
         limit: 200,
       });
+      return recent.reverse();
     }),
 
   send: protectedProcedure.input(sendMessageSchema).mutation(async ({ ctx, input }) => {
@@ -74,16 +77,37 @@ export const chatRouter = router({
           message: "Impossible de se contacter soi-même",
         });
       }
-      const [conversation] = await ctx.db
-        .insert(conversations)
-        .values({ listingId: input.listingId })
-        .returning();
-      if (!conversation) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-      conversationId = conversation.id;
-      await ctx.db.insert(conversationParticipants).values([
-        { conversationId, userId: ctx.user.id },
-        { conversationId, userId: listing.sellerId },
-      ]);
+      // Réutilise la conversation existante acheteur × annonce s'il y en a une.
+      const mine = await ctx.db
+        .select({ conversationId: conversationParticipants.conversationId })
+        .from(conversationParticipants)
+        .innerJoin(
+          conversations,
+          eq(conversations.id, conversationParticipants.conversationId),
+        )
+        .where(
+          and(
+            eq(conversationParticipants.userId, ctx.user.id),
+            eq(conversations.listingId, input.listingId),
+          ),
+        )
+        .limit(1);
+      if (mine[0]) {
+        conversationId = mine[0].conversationId;
+      } else {
+        conversationId = await ctx.db.transaction(async (tx) => {
+          const [conversation] = await tx
+            .insert(conversations)
+            .values({ listingId: input.listingId })
+            .returning();
+          if (!conversation) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+          await tx.insert(conversationParticipants).values([
+            { conversationId: conversation.id, userId: ctx.user.id },
+            { conversationId: conversation.id, userId: listing.sellerId },
+          ]);
+          return conversation.id;
+        });
+      }
     } else {
       await assertParticipant(ctx, conversationId, ctx.user.id);
     }

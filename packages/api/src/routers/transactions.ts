@@ -18,7 +18,8 @@ import {
 import { protectedProcedure, router } from "../trpc.js";
 
 /** Frais de service plateforme en centimes (1 € par défaut, 0 € pour un trade). */
-const FEE_CENTS = Number(process.env.PLATFORM_FEE_EUR_CENTS ?? 100);
+const rawFee = Number(process.env.PLATFORM_FEE_EUR_CENTS ?? 100);
+const FEE_CENTS = Number.isFinite(rawFee) && rawFee >= 0 ? Math.round(rawFee) : 100;
 
 function makeValidationCode() {
   // Code court lisible (QR + saisie manuelle), aléatoire crypto.
@@ -46,14 +47,19 @@ export const transactionsRouter = router({
           message: "L'offre doit être acceptée par le vendeur",
         });
       }
-      const existing = await ctx.db.query.transactions.findFirst({
-        where: eq(transactions.offerId, offer.id),
-      });
-      if (existing) return existing;
+      // L'annonce doit être réservée par CETTE offre (anti double-vente).
+      if (offer.listing.status !== "reserved") {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "L'annonce n'est plus disponible",
+        });
+      }
 
       const amountCents = offer.amountCents ?? offer.listing.priceCents ?? 0;
       const isPureTrade = amountCents === 0;
 
+      // Index unique sur offerId : les appels concurrents ne créent qu'une
+      // transaction ; onConflictDoNothing + relecture pour les perdants.
       const [tx] = await ctx.db
         .insert(transactions)
         .values({
@@ -66,8 +72,16 @@ export const transactionsRouter = router({
           currency: offer.listing.currency,
           status: isPureTrade ? "escrowed" : "pending_payment",
         })
+        .onConflictDoNothing({ target: transactions.offerId })
         .returning();
-      if (!tx) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+      if (!tx) {
+        const existing = await ctx.db.query.transactions.findFirst({
+          where: eq(transactions.offerId, offer.id),
+        });
+        if (!existing) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+        return existing;
+      }
 
       // Un code de validation par partie : chacun montre le sien, scanne l'autre.
       await ctx.db.insert(tradeValidations).values([
@@ -104,13 +118,15 @@ export const transactionsRouter = router({
       }
       const myValidation = tx.validations.find((v) => v.userId === ctx.user.id);
       const otherValidation = tx.validations.find((v) => v.userId !== ctx.user.id);
+      const { validations: _v, stripePaymentIntentId: _s, ...safeTx } = tx;
       return {
-        ...tx,
-        validations: undefined,
+        ...safeTx,
         /** Code que JE montre — jamais celui de l'autre partie. */
         myCode: myValidation?.qrToken ?? null,
-        iAmValidated: otherValidation?.validatedAt != null,
-        otherHasValidatedMe: myValidation?.validatedAt != null,
+        /** J'ai scanné/validé le code de l'autre partie. */
+        iValidatedOther: otherValidation?.validatedAt != null,
+        /** L'autre partie a scanné/validé mon code. */
+        otherValidatedMe: myValidation?.validatedAt != null,
       };
     }),
 
@@ -149,28 +165,43 @@ export const transactionsRouter = router({
           .where(eq(tradeValidations.id, otherValidation.id));
       }
 
-      const all = await ctx.db.query.tradeValidations.findMany({
-        where: eq(tradeValidations.transactionId, tx.id),
-      });
-      const complete = all.length === 2 && all.every((v) => v.validatedAt != null);
-      if (complete) {
-        await ctx.db
+      // Complétion transactionnelle : l'update conditionné par status <> completed
+      // garantit qu'UN SEUL des deux scans simultanés exécute le bloc final
+      // (tradeCount, clôture d'annonce) — pas de double incrément.
+      const completed = await ctx.db.transaction(async (dbTx) => {
+        const all = await dbTx.query.tradeValidations.findMany({
+          where: eq(tradeValidations.transactionId, tx.id),
+        });
+        const bothValidated =
+          all.length === 2 && all.every((v) => v.validatedAt != null);
+        if (!bothValidated) return false;
+
+        const [closed] = await dbTx
           .update(transactions)
           .set({ status: "completed", completedAt: new Date() })
-          .where(eq(transactions.id, tx.id));
-        await ctx.db
+          .where(
+            and(
+              eq(transactions.id, tx.id),
+              sql`${transactions.status} <> 'completed'`,
+            ),
+          )
+          .returning();
+        if (!closed) return true; // déjà complétée par l'autre scan
+
+        await dbTx
           .update(listings)
           .set({ status: "completed", updatedAt: new Date() })
           .where(eq(listings.id, tx.listingId));
-        await ctx.db
+        await dbTx
           .update(profiles)
           .set({ tradeCount: sql`${profiles.tradeCount} + 1` })
           .where(
             or(eq(profiles.userId, tx.buyerId), eq(profiles.userId, tx.sellerId)),
           );
         // Phase 2 : capture/transfert Stripe vers le vendeur ici.
-      }
-      return { completed: complete };
+        return true;
+      });
+      return { completed };
     }),
 
   review: protectedProcedure

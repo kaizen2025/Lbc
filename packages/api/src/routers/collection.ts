@@ -94,7 +94,11 @@ export const collectionRouter = router({
         sealedProduct: { with: { set: true } },
       },
     });
-    const escape = (value: string) => `"${value.replaceAll('"', '""')}"`;
+    // Guillemets échappés + neutralisation des préfixes de formule tableur.
+    const escape = (value: string) => {
+      const safe = /^[=+\-@]/.test(value) ? `'${value}` : value;
+      return `"${safe.replaceAll('"', '""')}"`;
+    };
     const header = "game,set,name,number,language,condition,foil,quantity,acquired_price_eur";
     const lines = items.map((item) => {
       const game = item.card?.set.game.name ?? "";
@@ -142,39 +146,53 @@ export const collectionRouter = router({
         }
       }
       const days = RANGE_DAYS[input.range] ?? null;
-      const since = days
-        ? sql`and ph.recorded_at >= current_date - ${days}::int`
-        : sql``;
 
-      // Somme par jour : quantité × dernier prix connu ce jour-là pour la
-      // variante exacte possédée (langue + état + foil + marché).
+      // Valeur quotidienne = somme(quantité × DERNIER prix connu ≤ jour) pour
+      // chaque variante possédée, sur un calendrier continu : une variante
+      // sans point de cote un jour donné garde sa dernière valeur (pas de
+      // dents de scie), et les quantités d'une même variante sont agrégées.
       const rows = await ctx.db.execute<{ day: string; total_cents: string }>(sql`
         with owned as (
           select ci.card_id, ci.sealed_product_id, ci.card_language, ci.condition,
-                 ci.is_foil, ci.quantity
+                 ci.is_foil, sum(ci.quantity) as quantity
           from ${collectionItems} ci
           where ci.user_id = ${ctx.user.id}
+          group by ci.card_id, ci.sealed_product_id, ci.card_language,
+                   ci.condition, ci.is_foil
+        ),
+        calendar as (
+          select generate_series(
+            coalesce(
+              (select min(recorded_at) from ${priceHistory} where market = ${input.market}),
+              current_date
+            ),
+            current_date, interval '1 day'
+          )::date as day
+        ),
+        bounded as (
+          select day from calendar
+          ${days ? sql`where day >= current_date - ${days}::int` : sql``}
         ),
         daily as (
-          select ph.recorded_at as day,
-                 o.quantity * ph.price_cents as line_cents,
-                 row_number() over (
-                   partition by ph.recorded_at,
-                     coalesce(ph.card_id, 0), coalesce(ph.sealed_product_id, 0),
-                     o.card_language, o.condition, o.is_foil
-                   order by ph.id desc
-                 ) as rn
-          from ${priceHistory} ph
-          join owned o
-            on (ph.card_id is not distinct from o.card_id)
-           and (ph.sealed_product_id is not distinct from o.sealed_product_id)
-           and (ph.card_language is not distinct from o.card_language)
-           and (ph.condition is not distinct from o.condition)
-           and ph.is_foil = o.is_foil
-          where ph.market = ${input.market} ${since}
+          select b.day, o.quantity * lp.price_cents as line_cents
+          from bounded b
+          cross join owned o
+          left join lateral (
+            select ph.price_cents
+            from ${priceHistory} ph
+            where ph.market = ${input.market}
+              and ph.recorded_at <= b.day
+              and (ph.card_id is not distinct from o.card_id)
+              and (ph.sealed_product_id is not distinct from o.sealed_product_id)
+              and (ph.card_language is not distinct from o.card_language)
+              and (ph.condition is not distinct from o.condition)
+              and ph.is_foil = o.is_foil
+            order by ph.recorded_at desc, ph.id desc
+            limit 1
+          ) lp on true
         )
-        select day::text, sum(line_cents)::text as total_cents
-        from daily where rn = 1
+        select day::text, coalesce(sum(line_cents), 0)::text as total_cents
+        from daily
         group by day order by day asc
       `);
 

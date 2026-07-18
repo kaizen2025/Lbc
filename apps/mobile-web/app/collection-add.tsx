@@ -89,7 +89,6 @@ export default function CollectionAddScreen() {
               {add.isPending ? t("common.loading") : t("collectionAdd.add")}
             </Text>
           </Pressable>
-          {add.isSuccess && <Muted>{t("collectionAdd.added")}</Muted>}
           {add.isError && (
             <Muted>
               {add.error.message.startsWith("PRO_REQUIRED")
@@ -99,6 +98,12 @@ export default function CollectionAddScreen() {
           )}
         </Card>
       )}
+      {/* Hors du bloc `card &&` : le succès reste visible après le reset */}
+      {add.isSuccess && !card && (
+        <Card>
+          <Text style={styles.success}>{t("collectionAdd.added")}</Text>
+        </Card>
+      )}
     </Screen>
   );
 }
@@ -106,4 +111,5 @@ export default function CollectionAddScreen() {
 const styles = StyleSheet.create({
   cardName: { color: colors.text, fontSize: 16, fontWeight: "700" },
   change: { color: colors.accent, fontWeight: "600" },
+  success: { color: colors.positive, fontSize: 16, fontWeight: "700" },
 });

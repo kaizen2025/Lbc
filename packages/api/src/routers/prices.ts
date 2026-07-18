@@ -1,8 +1,9 @@
 import { sql } from "drizzle-orm";
 import { priceHistory } from "@cardtrade/db";
 import { cardPriceQuerySchema } from "@cardtrade/validators";
+import { TRPCError } from "@trpc/server";
 import { publicProcedure, router } from "../trpc.js";
-import { getUserPlan } from "../lib/plans.js";
+import { FREE_LIMITS, getUserPlan } from "../lib/plans.js";
 
 const RANGE_DAYS: Record<string, number | null> = {
   "1d": 1,
@@ -20,6 +21,12 @@ export const pricesRouter = router({
    * à partir des deux dernières valeurs.
    */
   history: publicProcedure.input(cardPriceQuerySchema).query(async ({ ctx, input }) => {
+    const isPro =
+      ctx.user != null && (await getUserPlan(ctx.db, ctx.user.id)) === "pro";
+    // Même verrou que portfolioHistory : 6M/MAX réservés au PRO.
+    if (!FREE_LIMITS.chartRanges.includes(input.range) && !isPro) {
+      throw new TRPCError({ code: "FORBIDDEN", message: "PRO_REQUIRED:chart_range" });
+    }
     const days = RANGE_DAYS[input.range] ?? null;
     const conditions = [
       input.cardId != null
@@ -47,9 +54,6 @@ export const pricesRouter = router({
     `);
 
     // La cote EU est publique ; la cote US (et donc l'écart EU/US) est PRO.
-    const isPro =
-      ctx.user != null && (await getUserPlan(ctx.db, ctx.user.id)) === "pro";
-
     return {
       eu: rows.filter((r) => r.market === "eu"),
       us: isPro ? rows.filter((r) => r.market === "us") : [],

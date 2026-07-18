@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "transactions_offer_uq" ON "cardtrade"."transactions" USING btree ("offer_id");

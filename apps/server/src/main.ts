@@ -1,7 +1,7 @@
 import "./env.js";
 import http from "node:http";
 import { createReadStream, existsSync, statSync } from "node:fs";
-import { extname, join, normalize } from "node:path";
+import { extname, join, normalize, sep } from "node:path";
 import { createHTTPHandler } from "@trpc/server/adapters/standalone";
 import { createClient } from "@supabase/supabase-js";
 import { appRouter, createContext, type AuthUser } from "@cardtrade/api";
@@ -19,16 +19,20 @@ const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 const supabase =
   supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
+// Le mode d'auth dev (jeton "dev:<uuid>:<email>") est un OPT-IN explicite :
+// jamais actif par simple absence de config (constat critique n°2 de l'audit).
+const devAuthEnabled =
+  process.env.ALLOW_DEV_AUTH === "1" && process.env.NODE_ENV !== "production";
+
 /** Résout l'utilisateur depuis le JWT Supabase du header Authorization. */
 async function resolveUser(authorization: string | undefined): Promise<AuthUser | null> {
   if (!authorization?.startsWith("Bearer ")) return null;
   const token = authorization.slice("Bearer ".length);
 
-  // Mode dev sans Supabase configuré : jeton "dev:<uuid>:<email>" accepté.
   if (!supabase) {
-    const [prefix, id, email] = token.split(":");
-    if (prefix === "dev" && id && email && process.env.NODE_ENV !== "production") {
-      return { id, email };
+    if (devAuthEnabled) {
+      const [prefix, id, email] = token.split(":");
+      if (prefix === "dev" && id && email) return { id, email };
     }
     return null;
   }
@@ -40,11 +44,30 @@ async function resolveUser(authorization: string | undefined): Promise<AuthUser 
 
 const trpcHandler = createHTTPHandler({
   router: appRouter,
+  maxBodySize: 1_000_000, // 1 Mo — les photos passent par Supabase Storage, pas ici
   createContext: async ({ req }) => {
     const user = await resolveUser(req.headers.authorization);
     return createContext({ db, user });
   },
 });
+
+// Rate limiting en mémoire par IP (suffisant pour la recette mono-process).
+const RATE_LIMIT = Number(process.env.RATE_LIMIT_PER_MINUTE ?? 300);
+const hits = new Map<string, { count: number; windowStart: number }>();
+function rateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = hits.get(ip);
+  if (!entry || now - entry.windowStart > 60_000) {
+    hits.set(ip, { count: 1, windowStart: now });
+    return false;
+  }
+  entry.count += 1;
+  return entry.count > RATE_LIMIT;
+}
+setInterval(() => {
+  const cutoff = Date.now() - 120_000;
+  for (const [ip, entry] of hits) if (entry.windowStart < cutoff) hits.delete(ip);
+}, 60_000).unref();
 
 const MIME: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -65,7 +88,8 @@ function serveStatic(pathname: string, res: http.ServerResponse): boolean {
   // normalize() neutralise les "../" — jamais de sortie du dossier dist.
   const safePath = normalize(pathname).replace(/^(\.\.[/\\])+/, "");
   let filePath = join(WEB_DIST, safePath);
-  if (!filePath.startsWith(WEB_DIST)) return false;
+  // Comparaison avec séparateur final : un dossier frère "dist-x" ne passe pas.
+  if (filePath !== WEB_DIST && !filePath.startsWith(WEB_DIST + sep)) return false;
   if (!existsSync(filePath) || statSync(filePath).isDirectory()) {
     // SPA : toute route inconnue renvoie index.html (Expo Router côté client)
     filePath = join(WEB_DIST, "index.html");
@@ -77,7 +101,12 @@ function serveStatic(pathname: string, res: http.ServerResponse): boolean {
       ? "no-cache"
       : "public, max-age=31536000, immutable",
   });
-  createReadStream(filePath).pipe(res);
+  const stream = createReadStream(filePath);
+  stream.on("error", () => {
+    if (!res.headersSent) res.writeHead(500);
+    res.end();
+  });
+  stream.pipe(res);
   return true;
 }
 
@@ -100,6 +129,15 @@ const server = http.createServer((req, res) => {
   }
 
   if (url.pathname.startsWith("/trpc")) {
+    const ip =
+      (req.headers["x-forwarded-for"] as string | undefined)?.split(",")[0]?.trim() ??
+      req.socket.remoteAddress ??
+      "unknown";
+    if (rateLimited(ip)) {
+      res.writeHead(429, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "rate_limited" }));
+      return;
+    }
     // L'adaptateur standalone attend l'URL sans le préfixe /trpc.
     req.url = req.url!.replace(/^\/trpc/, "") || "/";
     trpcHandler(req, res);

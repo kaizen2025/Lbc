@@ -9,6 +9,20 @@ import {
 } from "@cardtrade/validators";
 import { protectedProcedure, publicProcedure, router } from "../trpc.js";
 import { distanceKmSql } from "../lib/geo.js";
+import { publicUserWith } from "../lib/publicProfile.js";
+
+/** Arrondi ~1 km : jamais les coordonnées exactes du domicile sur une annonce. */
+function fuzzCoordinate(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+/** Retire les coordonnées d'une ligne annonce avant de la renvoyer au client. */
+function stripCoords<T extends { latitude: number | null; longitude: number | null }>(
+  listing: T,
+): Omit<T, "latitude" | "longitude"> {
+  const { latitude: _lat, longitude: _lng, ...safe } = listing;
+  return safe;
+}
 
 export const listingsRouter = router({
   create: protectedProcedure
@@ -31,24 +45,43 @@ export const listingsRouter = router({
           ...input,
           sellerId: ctx.user.id,
           city: profile.city,
-          latitude: profile.latitude,
-          longitude: profile.longitude,
+          latitude: fuzzCoordinate(profile.latitude),
+          longitude: fuzzCoordinate(profile.longitude),
         })
         .returning();
-      return created;
+      return created ? stripCoords(created) : created;
     }),
 
   update: protectedProcedure
     .input(updateListingSchema)
     .mutation(async ({ ctx, input }) => {
       const { id, ...patch } = input;
+      if (patch.cardId != null && patch.sealedProductId != null) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Une annonce référence soit une carte, soit un produit scellé",
+        });
+      }
+      // Anti bait-and-switch : une annonce réservée/terminée ne se modifie plus
+      // (le vendeur ne peut ni changer la carte ni la repasser en active).
       const [updated] = await ctx.db
         .update(listings)
         .set({ ...patch, updatedAt: new Date() })
-        .where(and(eq(listings.id, id), eq(listings.sellerId, ctx.user.id)))
+        .where(
+          and(
+            eq(listings.id, id),
+            eq(listings.sellerId, ctx.user.id),
+            eq(listings.status, "active"),
+          ),
+        )
         .returning();
-      if (!updated) throw new TRPCError({ code: "NOT_FOUND" });
-      return updated;
+      if (!updated) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Annonce introuvable ou plus modifiable",
+        });
+      }
+      return stripCoords(updated);
     }),
 
   byId: publicProcedure
@@ -59,11 +92,11 @@ export const listingsRouter = router({
         with: {
           card: { with: { set: { with: { game: true } } } },
           sealedProduct: true,
-          seller: { with: { profile: true } },
+          seller: publicUserWith,
         },
       });
       if (!listing) throw new TRPCError({ code: "NOT_FOUND" });
-      return listing;
+      return stripCoords(listing);
     }),
 
   mine: protectedProcedure.query(({ ctx }) =>
@@ -121,7 +154,10 @@ export const listingsRouter = router({
 
     const hasMore = rows.length > input.limit;
     return {
-      items: rows.slice(0, input.limit),
+      items: rows.slice(0, input.limit).map(({ listing, distanceKm }) => ({
+        listing: stripCoords(listing),
+        distanceKm,
+      })),
       nextCursor: hasMore ? input.cursor + input.limit : null,
     };
   }),

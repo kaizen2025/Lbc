@@ -101,6 +101,7 @@ export default function ProfileScreen() {
               <Pressable onPress={() => removeAlert.mutate({ id: alert.id })}>
                 <Text style={styles.signOut}>{t("alerts.delete")}</Text>
               </Pressable>
+              {removeAlert.isError && <Muted>{removeAlert.error.message}</Muted>}
             </Card>
           ))}
         </>

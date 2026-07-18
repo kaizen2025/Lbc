@@ -407,6 +407,8 @@ export const transactions = cardtradeSchema.table(
   (t) => [
     index("transactions_buyer_idx").on(t.buyerId),
     index("transactions_seller_idx").on(t.sellerId),
+    // Une offre = au plus une transaction (anti course concurrente).
+    uniqueIndex("transactions_offer_uq").on(t.offerId),
   ],
 );
 

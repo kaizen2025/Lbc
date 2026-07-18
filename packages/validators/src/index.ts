@@ -86,8 +86,6 @@ export const updateListingSchema = listingBase.partial().extend({
 
 export const searchListingsSchema = z.object({
   query: z.string().max(200).optional(),
-  gameId: z.number().int().positive().optional(),
-  setId: z.number().int().positive().optional(),
   cardId: z.number().int().positive().optional(),
   type: listingTypeSchema.optional(),
   cardLanguage: cardLanguageSchema.optional(),
@@ -109,7 +107,8 @@ export const searchListingsSchema = z.object({
 export const createOfferSchema = z
   .object({
     listingId: z.string().uuid(),
-    amountCents: z.number().int().min(0).max(10_000_000).optional(),
+    /** Minimum 1 centime : une offre à 0 € (pur trade) omet le montant. */
+    amountCents: z.number().int().min(1).max(10_000_000).optional(),
     tradeItemIds: z.array(z.string().uuid()).max(50).default([]),
     message: z.string().max(1000).optional(),
     parentOfferId: z.string().uuid().optional(),

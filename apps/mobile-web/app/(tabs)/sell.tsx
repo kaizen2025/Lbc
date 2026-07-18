@@ -142,7 +142,6 @@ export default function SellScreen() {
                 {create.isPending ? t("common.loading") : t("sell.publish")}
               </Text>
             </Pressable>
-            {create.isSuccess && <Muted>{t("sell.published")}</Muted>}
             {create.isError && (
               <Muted>
                 {create.error.data?.code === "PRECONDITION_FAILED"
@@ -153,6 +152,12 @@ export default function SellScreen() {
           </Card>
         </>
       )}
+      {/* Hors du bloc `card &&` : le succès reste visible après le reset du formulaire */}
+      {create.isSuccess && !card && (
+        <Card>
+          <Text style={styles.success}>{t("sell.published")}</Text>
+        </Card>
+      )}
     </Screen>
   );
 }
@@ -161,4 +166,5 @@ const styles = StyleSheet.create({
   emphasis: { color: colors.gold, fontSize: 15, fontWeight: "600" },
   cardName: { color: colors.text, fontSize: 16, fontWeight: "700" },
   change: { color: colors.accent, fontWeight: "600" },
+  success: { color: colors.positive, fontSize: 16, fontWeight: "700" },
 });

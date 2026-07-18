@@ -181,6 +181,8 @@
     "accepted": "acceptée",
     "declined": "refusée",
     "pending": "en attente",
+    "countered": "contre-offre reçue",
+    "withdrawn": "retirée",
     "messagePlaceholder": "Écris ton message…",
     "send": "Envoyer",
     "concludeTrade": "Conclure en main propre",

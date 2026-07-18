@@ -68,7 +68,12 @@ export default function AuthScreen() {
         </Pressable>
         {message && <Muted>{message}</Muted>}
       </Card>
-      <Pressable onPress={() => setMode(mode === "signin" ? "signup" : "signin")}>
+      <Pressable
+        onPress={() => {
+          setMessage(null);
+          setMode(mode === "signin" ? "signup" : "signin");
+        }}
+      >
         <Text style={styles.switchMode}>
           {mode === "signin" ? t("auth.noAccount") : t("auth.haveAccount")}
         </Text>

@@ -110,9 +110,10 @@ export default function ListingDetailScreen() {
                   >
                     <Text style={styles.declineText}>{t("listingDetail.decline")}</Text>
                   </Pressable>
+                  {respondOffer.isError && <Muted>{respondOffer.error.message}</Muted>}
                 </View>
               ) : (
-                <Muted>{t(`listingDetail.${offer.status}` as never)}</Muted>
+                <Muted>{t(`listingDetail.${offer.status}`)}</Muted>
               )}
             </Card>
           ))}
@@ -131,12 +132,18 @@ export default function ListingDetailScreen() {
             />
             <Pressable
               style={formStyles.cta}
-              disabled={createOffer.isPending}
+              // Jamais d'offre à 0 € par défaut : un montant vide/invalide ne
+              // doit pas court-circuiter le séquestre côté serveur.
+              disabled={
+                createOffer.isPending ||
+                !(Math.round(Number(offerAmount.replace(",", ".")) * 100) > 0)
+              }
               onPress={() => {
                 const cents = Math.round(Number(offerAmount.replace(",", ".")) * 100);
+                if (!Number.isFinite(cents) || cents <= 0) return;
                 createOffer.mutate({
                   listingId: item.id,
-                  amountCents: Number.isFinite(cents) && cents >= 0 ? cents : 0,
+                  amountCents: cents,
                   tradeItemIds: [],
                 });
               }}
@@ -148,15 +155,20 @@ export default function ListingDetailScreen() {
           </Card>
 
           {offers.data?.some((offer) => offer.status === "accepted") && (
-            <Pressable
-              style={formStyles.cta}
-              onPress={() => {
-                const accepted = offers.data?.find((o) => o.status === "accepted");
-                if (accepted) createTx.mutate({ offerId: accepted.id });
-              }}
-            >
-              <Text style={formStyles.ctaText}>{t("listingDetail.concludeTrade")}</Text>
-            </Pressable>
+            <>
+              <Pressable
+                style={formStyles.cta}
+                onPress={() => {
+                  const accepted = offers.data?.find((o) => o.status === "accepted");
+                  if (accepted) createTx.mutate({ offerId: accepted.id });
+                }}
+              >
+                <Text style={formStyles.ctaText}>
+                  {t("listingDetail.concludeTrade")}
+                </Text>
+              </Pressable>
+              {createTx.isError && <Muted>{createTx.error.message}</Muted>}
+            </>
           )}
 
           {item.cardId != null && (
@@ -199,6 +211,7 @@ export default function ListingDetailScreen() {
             >
               <Text style={formStyles.ctaText}>{t("listingDetail.send")}</Text>
             </Pressable>
+            {sendMessage.isError && <Muted>{sendMessage.error.message}</Muted>}
           </Card>
         </>
       ) : (

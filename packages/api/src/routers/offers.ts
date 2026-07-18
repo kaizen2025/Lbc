@@ -1,9 +1,10 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { and, desc, eq } from "drizzle-orm";
-import { listings, offers } from "@cardtrade/db";
+import { and, desc, eq, inArray } from "drizzle-orm";
+import { collectionItems, listings, offers } from "@cardtrade/db";
 import { createOfferSchema, respondOfferSchema } from "@cardtrade/validators";
 import { protectedProcedure, router } from "../trpc.js";
+import { publicUserWith } from "../lib/publicProfile.js";
 
 export const offersRouter = router({
   create: protectedProcedure.input(createOfferSchema).mutation(async ({ ctx, input }) => {
@@ -18,6 +19,33 @@ export const offersRouter = router({
         code: "BAD_REQUEST",
         message: "Impossible de faire une offre sur sa propre annonce",
       });
+    }
+    // Les items proposés en échange doivent appartenir à l'offreur.
+    if (input.tradeItemIds.length > 0) {
+      const owned = await ctx.db
+        .select({ id: collectionItems.id })
+        .from(collectionItems)
+        .where(
+          and(
+            inArray(collectionItems.id, input.tradeItemIds),
+            eq(collectionItems.userId, ctx.user.id),
+          ),
+        );
+      if (owned.length !== input.tradeItemIds.length) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Certains items proposés n'appartiennent pas à ta collection",
+        });
+      }
+    }
+    // Une contre-offre référence une offre de la même annonce.
+    if (input.parentOfferId) {
+      const parent = await ctx.db.query.offers.findFirst({
+        where: eq(offers.id, input.parentOfferId),
+      });
+      if (!parent || parent.listingId !== input.listingId) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Offre parente invalide" });
+      }
     }
     const [created] = await ctx.db
       .insert(offers)
@@ -41,6 +69,13 @@ export const offersRouter = router({
       if (offer.status !== "pending") {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Offre déjà traitée" });
       }
+      // Anti double-vente : on ne peut accepter que sur une annonce active.
+      if (input.action === "accept" && offer.listing.status !== "active") {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Annonce déjà réservée ou clôturée",
+        });
+      }
       const status = input.action === "accept" ? "accepted" : "declined";
       const [updated] = await ctx.db
         .update(offers)
@@ -52,6 +87,16 @@ export const offersRouter = router({
           .update(listings)
           .set({ status: "reserved", updatedAt: new Date() })
           .where(eq(listings.id, offer.listingId));
+        // Les autres offres en attente sont refusées automatiquement.
+        await ctx.db
+          .update(offers)
+          .set({ status: "declined" })
+          .where(
+            and(
+              eq(offers.listingId, offer.listingId),
+              eq(offers.status, "pending"),
+            ),
+          );
         // Phase 2 : créer ici la transaction séquestrée (Stripe PaymentIntent).
       }
       return updated;
@@ -69,7 +114,7 @@ export const offersRouter = router({
         where: isSeller
           ? eq(offers.listingId, input.listingId)
           : and(eq(offers.listingId, input.listingId), eq(offers.buyerId, ctx.user.id)),
-        with: { buyer: { with: { profile: true } } },
+        with: { buyer: publicUserWith },
         orderBy: desc(offers.createdAt),
       });
     }),

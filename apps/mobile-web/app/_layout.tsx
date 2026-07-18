@@ -1,12 +1,27 @@
 import "../src/lib/i18n";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useTranslation } from "react-i18next";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createTrpcClient, trpc } from "../src/lib/trpc";
-import { SessionProvider } from "../src/lib/auth";
+import { SessionProvider, useSession } from "../src/lib/auth";
 import { colors } from "../src/theme";
+
+/** Vide le cache react-query à chaque changement d'utilisateur (login/logout) —
+ *  sinon les onglets gardent les erreurs 401 ou les données de l'ancien compte. */
+function AuthCacheReset({ queryClient }: { queryClient: QueryClient }) {
+  const { session } = useSession();
+  const previousUserId = useRef<string | null | undefined>(undefined);
+  useEffect(() => {
+    const userId = session?.user.id ?? null;
+    if (previousUserId.current !== undefined && previousUserId.current !== userId) {
+      queryClient.clear();
+    }
+    previousUserId.current = userId;
+  }, [session?.user.id, queryClient]);
+  return null;
+}
 
 export default function RootLayout() {
   const { t } = useTranslation();
@@ -17,6 +32,7 @@ export default function RootLayout() {
     <SessionProvider>
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
+          <AuthCacheReset queryClient={queryClient} />
           <StatusBar style="light" />
           <Stack
             screenOptions={{

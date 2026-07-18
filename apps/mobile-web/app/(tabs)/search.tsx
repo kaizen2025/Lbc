@@ -84,8 +84,10 @@ export default function SearchScreen() {
                     {listing.cardLanguage ? ` · ${listing.cardLanguage.toUpperCase()}` : ""}
                   </Text>
                   <Muted>
-                    {listing.city ?? "—"} ·{" "}
-                    {t("home.distanceAway", { distance: distanceKm.toFixed(1) })}
+                    {listing.city ?? "—"}
+                    {distanceKm > 0
+                      ? ` · ${t("home.distanceAway", { distance: distanceKm.toFixed(1) })}`
+                      : ""}
                   </Muted>
                   {listing.priceCents != null && (
                     <Text style={styles.price}>

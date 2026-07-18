@@ -4,6 +4,7 @@ import { Link, router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@cardtrade/i18n";
 import { Card, Muted, PriceChange, Screen, SectionTitle } from "../../src/components/ui";
+import { useSession } from "../../src/lib/auth";
 import { trpc } from "../../src/lib/trpc";
 import { colors, radius, spacing } from "../../src/theme";
 
@@ -14,14 +15,18 @@ const PRO_RANGES: readonly Range[] = ["6m", "max"];
 
 export default function PortfolioScreen() {
   const { t, i18n } = useTranslation();
+  const { session } = useSession();
   const [range, setRange] = useState<Range>("1m");
   const [market, setMarket] = useState<"eu" | "us">("eu");
 
   const history = trpc.collection.portfolioHistory.useQuery(
     { range, market },
-    { retry: false },
+    { retry: false, enabled: !!session },
   );
-  const items = trpc.collection.list.useQuery(undefined, { retry: false });
+  const items = trpc.collection.list.useQuery(undefined, {
+    retry: false,
+    enabled: !!session,
+  });
   const utils = trpc.useUtils();
   const [exportStatus, setExportStatus] = useState<string | null>(null);
 
@@ -65,7 +70,11 @@ export default function PortfolioScreen() {
         <Text style={styles.totalValue}>
           {formatCurrency(latest, currency, i18n.language)}
         </Text>
-        <PriceChange cents={delta} percent={first ? (delta / first) * 100 : 0} />
+        <PriceChange
+          cents={delta}
+          percent={first ? (delta / first) * 100 : 0}
+          currency={currency}
+        />
 
         <View style={styles.rangeRow}>
           {RANGES.map((r) => (

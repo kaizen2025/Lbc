@@ -15,7 +15,15 @@ export default function TransactionScreen() {
 
   const tx = trpc.transactions.byId.useQuery(
     { id: id! },
-    { enabled: !!id, refetchInterval: 5000 },
+    {
+      enabled: !!id,
+      // Poll tant que l'échange est en cours, stop une fois terminé/annulé.
+      refetchInterval: (query) =>
+        query.state.data?.status === "completed" ||
+        query.state.data?.status === "cancelled"
+          ? false
+          : 5000,
+    },
   );
   const [code, setCode] = useState("");
   const validate = trpc.transactions.validate.useMutation({
@@ -64,7 +72,6 @@ export default function TransactionScreen() {
           <Card style={styles.qrCard}>
             <Text style={styles.code}>{item.myCode ?? "—"}</Text>
             <Muted>{t("tx.showQr")}</Muted>
-            {item.otherHasValidatedMe && <Muted>{t("tx.youValidated")}</Muted>}
           </Card>
 
           <SectionTitle>{t("transaction.scanQr")}</SectionTitle>
@@ -85,7 +92,7 @@ export default function TransactionScreen() {
             >
               <Text style={formStyles.ctaText}>{t("tx.validate")}</Text>
             </Pressable>
-            {item.iAmValidated && !done && <Muted>{t("tx.youValidated")}</Muted>}
+            {item.iValidatedOther && !done && <Muted>{t("tx.youValidated")}</Muted>}
             {validate.isError && <Muted>{validate.error.message}</Muted>}
           </Card>
         </>

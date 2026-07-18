@@ -25,8 +25,10 @@ export default function HomeScreen() {
                   `${t(`listing.${listing.type}`)} · #${listing.id.slice(0, 8)}`}
               </Text>
               <Muted>
-                {listing.city ?? "—"} ·{" "}
-                {t("home.distanceAway", { distance: distanceKm.toFixed(1) })}
+                {listing.city ?? "—"}
+                {distanceKm > 0
+                  ? ` · ${t("home.distanceAway", { distance: distanceKm.toFixed(1) })}`
+                  : ""}
               </Muted>
               {listing.priceCents != null && (
                 <Text style={styles.price}>

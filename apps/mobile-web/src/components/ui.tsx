@@ -34,11 +34,20 @@ export function Muted({ children }: PropsWithChildren) {
   return <Text style={styles.muted}>{children}</Text>;
 }
 
-export function PriceChange({ cents, percent }: { cents: number; percent?: number }) {
+export function PriceChange({
+  cents,
+  percent,
+  currency = "EUR",
+}: {
+  cents: number;
+  percent?: number;
+  currency?: "EUR" | "USD";
+}) {
   const positive = cents >= 0;
+  const symbol = currency === "USD" ? "$" : "€";
   return (
     <Text style={[styles.priceChange, { color: positive ? colors.positive : colors.negative }]}>
-      {positive ? "▲" : "▼"} {(Math.abs(cents) / 100).toFixed(2)} €
+      {positive ? "▲" : "▼"} {(Math.abs(cents) / 100).toFixed(2)} {symbol}
       {percent != null ? ` (${Math.abs(percent).toFixed(2)} %)` : ""}
     </Text>
   );

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Platform, Pressable, StyleSheet, Text, TextInput } from "react-native";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { Card, Muted, Screen } from "../src/components/ui";
@@ -19,8 +19,12 @@ export default function ProfileEditScreen() {
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [locationStatus, setLocationStatus] = useState<string | null>(null);
 
+  // Hydrate les champs UNE seule fois — un refetch (focus fenêtre) ne doit pas
+  // écraser une saisie en cours.
+  const hydrated = useRef(false);
   useEffect(() => {
-    if (me.data?.profile) {
+    if (me.data?.profile && !hydrated.current) {
+      hydrated.current = true;
       setUsername(me.data.profile.username);
       setCity(me.data.profile.city ?? "");
       if (me.data.profile.latitude != null && me.data.profile.longitude != null) {
@@ -30,20 +34,28 @@ export default function ProfileEditScreen() {
   }, [me.data]);
 
   async function useMyLocation() {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setLocationStatus(t("profileEdit.locationDenied"));
+        return;
+      }
+      const position = await Location.getCurrentPositionAsync({});
+      setCoords({ lat: position.coords.latitude, lng: position.coords.longitude });
+      let detectedCity = "";
+      // reverseGeocodeAsync n'est pas supporté sur web.
+      if (Platform.OS !== "web") {
+        const places = await Location.reverseGeocodeAsync({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+        detectedCity = places[0]?.city ?? places[0]?.subregion ?? "";
+        if (detectedCity) setCity(detectedCity);
+      }
+      setLocationStatus(t("profileEdit.locationSet", { city: detectedCity || "✓" }));
+    } catch {
       setLocationStatus(t("profileEdit.locationDenied"));
-      return;
     }
-    const position = await Location.getCurrentPositionAsync({});
-    setCoords({ lat: position.coords.latitude, lng: position.coords.longitude });
-    const places = await Location.reverseGeocodeAsync({
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-    });
-    const detectedCity = places[0]?.city ?? places[0]?.subregion ?? "";
-    if (detectedCity) setCity(detectedCity);
-    setLocationStatus(t("profileEdit.locationSet", { city: detectedCity || "✓" }));
   }
 
   function save() {

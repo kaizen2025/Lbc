@@ -59,6 +59,7 @@ export default function RootLayout() {
               options={{ presentation: "modal", title: t("collectionAdd.title") }}
             />
             <Stack.Screen name="listing/[id]" options={{ title: "" }} />
+            <Stack.Screen name="card/[id]" options={{ title: "" }} />
             <Stack.Screen name="conversation/[id]" options={{ title: "" }} />
             <Stack.Screen
               name="transaction/[id]"

@@ -192,6 +192,19 @@
     "placeholder": "Your message…",
     "empty": "Start the conversation 👋"
   },
+  "photos": {
+    "add": "📷 Add a photo",
+    "uploading": "Uploading photo…",
+    "count": "{{count}}/3 photos"
+  },
+  "card": {
+    "euPrice": "EU market price",
+    "usPrice": "US price",
+    "gap": "EU/US gap: {{gap}}%",
+    "sellersNearby": "Sellers near you",
+    "noSellers": "No listing for this card in your radius",
+    "proLocked": "US price and gap are PRO-only"
+  },
   "searchTabs": {
     "cards": "Catalog",
     "listings": "Listings"

@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@cardtrade/i18n";
@@ -59,6 +67,15 @@ export default function ListingDetailScreen() {
   return (
     <Screen>
       <Text style={styles.title}>{title}</Text>
+      {item.photos.length > 0 && (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={styles.gallery}>
+            {item.photos.map((url) => (
+              <Image key={url} source={{ uri: url }} style={styles.photo} />
+            ))}
+          </View>
+        </ScrollView>
+      )}
       <Card>
         <Muted>
           {t(`listing.${item.type}`)}
@@ -239,4 +256,6 @@ const styles = StyleSheet.create({
   },
   declineText: { color: colors.negative, fontWeight: "700" },
   alertButton: { color: colors.gold, fontSize: 16, fontWeight: "700" },
+  gallery: { flexDirection: "row", gap: spacing.sm },
+  photo: { width: 220, height: 220, borderRadius: 12 },
 });

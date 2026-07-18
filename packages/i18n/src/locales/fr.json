@@ -192,6 +192,19 @@
     "placeholder": "Ton message…",
     "empty": "Démarre la conversation 👋"
   },
+  "photos": {
+    "add": "📷 Ajouter une photo",
+    "uploading": "Envoi de la photo…",
+    "count": "{{count}}/3 photos"
+  },
+  "card": {
+    "euPrice": "Cote Europe",
+    "usPrice": "Cote US",
+    "gap": "Écart EU/US : {{gap}} %",
+    "sellersNearby": "Vendeurs près de chez toi",
+    "noSellers": "Aucune annonce pour cette carte dans ton rayon",
+    "proLocked": "Cote US et écart réservés aux membres PRO"
+  },
   "searchTabs": {
     "cards": "Catalogue",
     "listings": "Annonces"

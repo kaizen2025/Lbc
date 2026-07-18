@@ -105,12 +105,16 @@ export default function SearchScreen() {
         <>
           {cards.isFetching && <Muted>{t("common.loading")}</Muted>}
           {cards.data?.map((card) => (
-            <Card key={card.id}>
-              <Text style={styles.cardName}>{card.name}</Text>
-              <Muted>
-                {card.set.game.name} · {card.set.name} · {card.number}
-              </Muted>
-            </Card>
+            <Link key={card.id} href={`/card/${card.id}`} asChild>
+              <Pressable>
+                <Card>
+                  <Text style={styles.cardName}>{card.name}</Text>
+                  <Muted>
+                    {card.set.game.name} · {card.set.name} · {card.number}
+                  </Muted>
+                </Card>
+              </Pressable>
+            </Link>
           ))}
           {query.length >= 2 && cards.data?.length === 0 && (
             <Muted>{t("search.noResults")}</Muted>

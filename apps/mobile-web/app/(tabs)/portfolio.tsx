@@ -4,6 +4,7 @@ import { Link, router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@cardtrade/i18n";
 import { Card, Muted, PriceChange, Screen, SectionTitle } from "../../src/components/ui";
+import { Sparkline } from "../../src/components/Sparkline";
 import { useSession } from "../../src/lib/auth";
 import { trpc } from "../../src/lib/trpc";
 import { colors, radius, spacing } from "../../src/theme";
@@ -75,6 +76,8 @@ export default function PortfolioScreen() {
           percent={first ? (delta / first) * 100 : 0}
           currency={currency}
         />
+
+        <Sparkline points={points.map((p) => p.totalCents)} />
 
         <View style={styles.rangeRow}>
           {RANGES.map((r) => (

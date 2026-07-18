@@ -69,6 +69,23 @@ export const profileRouter = router({
       }
     }),
 
+  /**
+   * Suppression de compte (RGPD) : purge toutes les données via les cascades
+   * DB, puis supprime le compte auth Supabase si la clé service est fournie.
+   */
+  deleteAccount: protectedProcedure.mutation(async ({ ctx }) => {
+    await ctx.db.delete(users).where(eq(users.id, ctx.user.id));
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (supabaseUrl && serviceKey) {
+      await fetch(`${supabaseUrl}/auth/v1/admin/users/${ctx.user.id}`, {
+        method: "DELETE",
+        headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+      }).catch((error) => console.error("deleteAccount auth:", error));
+    }
+    return { ok: true };
+  }),
+
   /** Profil public : liste blanche stricte — jamais GPS, email ni Stripe. */
   byUsername: publicProcedure
     .input(z.object({ username: z.string().min(1) }))

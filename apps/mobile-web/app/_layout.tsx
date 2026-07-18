@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createTrpcClient, trpc } from "../src/lib/trpc";
 import { SessionProvider, useSession } from "../src/lib/auth";
+import { PushRegistrar } from "../src/components/PushRegistrar";
 import { colors } from "../src/theme";
 
 /** Vide le cache react-query à chaque changement d'utilisateur (login/logout) —
@@ -33,6 +34,7 @@ export default function RootLayout() {
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
           <AuthCacheReset queryClient={queryClient} />
+          <PushRegistrar />
           <StatusBar style="light" />
           <Stack
             screenOptions={{
@@ -60,6 +62,10 @@ export default function RootLayout() {
             />
             <Stack.Screen name="listing/[id]" options={{ title: "" }} />
             <Stack.Screen name="card/[id]" options={{ title: "" }} />
+            <Stack.Screen
+              name="legal"
+              options={{ presentation: "modal", title: t("legal.title") }}
+            />
             <Stack.Screen name="conversation/[id]" options={{ title: "" }} />
             <Stack.Screen
               name="transaction/[id]"

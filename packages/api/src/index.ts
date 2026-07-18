@@ -7,6 +7,7 @@ import { chatRouter } from "./routers/chat.js";
 import { collectionRouter } from "./routers/collection.js";
 import { pricesRouter } from "./routers/prices.js";
 import { profileRouter } from "./routers/profile.js";
+import { notificationsRouter } from "./routers/notifications.js";
 import { subscriptionRouter } from "./routers/subscription.js";
 import { transactionsRouter } from "./routers/transactions.js";
 
@@ -19,6 +20,7 @@ export const appRouter = router({
   collection: collectionRouter,
   prices: pricesRouter,
   profile: profileRouter,
+  notifications: notificationsRouter,
   subscription: subscriptionRouter,
   transactions: transactionsRouter,
 });
@@ -27,3 +29,4 @@ export const appRouter = router({
 export type AppRouter = typeof appRouter;
 
 export { createContext, type AuthUser, type Context } from "./context.js";
+export { notifyUser } from "./lib/notify.js";

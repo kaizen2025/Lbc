@@ -10,6 +10,7 @@ import {
 import { sendMessageSchema } from "@cardtrade/validators";
 import { protectedProcedure, router } from "../trpc.js";
 import { publicUserWith } from "../lib/publicProfile.js";
+import { notifyUser } from "../lib/notify.js";
 
 async function assertParticipant(
   ctx: { db: import("@cardtrade/db").Database },
@@ -116,6 +117,21 @@ export const chatRouter = router({
       .insert(messages)
       .values({ conversationId, senderId: ctx.user.id, body: input.body })
       .returning();
+
+    // Push + email au destinataire (best-effort, hors chemin critique).
+    const others = await ctx.db
+      .select({ userId: conversationParticipants.userId })
+      .from(conversationParticipants)
+      .where(eq(conversationParticipants.conversationId, conversationId));
+    for (const participant of others) {
+      if (participant.userId !== ctx.user.id) {
+        notifyUser(ctx.db, participant.userId, {
+          title: "CardTrade — nouveau message",
+          body: input.body.slice(0, 120),
+          data: { conversationId },
+        });
+      }
+    }
     return message;
   }),
 });

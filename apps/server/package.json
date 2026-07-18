@@ -8,6 +8,7 @@
     "start": "tsx src/main.ts",
     "job:prices": "tsx src/run-price-sync.ts",
     "job:catalog": "tsx src/run-catalog-import.ts",
+    "job:alerts": "tsx src/run-alerts.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

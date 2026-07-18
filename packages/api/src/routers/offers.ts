@@ -5,6 +5,7 @@ import { collectionItems, listings, offers } from "@cardtrade/db";
 import { createOfferSchema, respondOfferSchema } from "@cardtrade/validators";
 import { protectedProcedure, router } from "../trpc.js";
 import { publicUserWith } from "../lib/publicProfile.js";
+import { notifyUser } from "../lib/notify.js";
 
 export const offersRouter = router({
   create: protectedProcedure.input(createOfferSchema).mutation(async ({ ctx, input }) => {
@@ -51,6 +52,13 @@ export const offersRouter = router({
       .insert(offers)
       .values({ ...input, buyerId: ctx.user.id })
       .returning();
+    notifyUser(ctx.db, listing.sellerId, {
+      title: "CardTrade — nouvelle offre",
+      body: input.amountCents
+        ? `Offre de ${(input.amountCents / 100).toFixed(2)} € reçue sur ton annonce`
+        : "Proposition d'échange reçue sur ton annonce",
+      data: { listingId: listing.id },
+    });
     return created;
   }),
 
@@ -98,6 +106,11 @@ export const offersRouter = router({
             ),
           );
         // Phase 2 : créer ici la transaction séquestrée (Stripe PaymentIntent).
+        notifyUser(ctx.db, offer.buyerId, {
+          title: "CardTrade — offre acceptée 🎉",
+          body: "Ton offre a été acceptée : organise le rendez-vous dans l'app",
+          data: { listingId: offer.listingId },
+        });
       }
       return updated;
     }),

@@ -52,6 +52,7 @@ export default function ListingDetailScreen() {
       created && router.push(`/conversation/${created.conversationId}`),
   });
   const createAlert = trpc.alerts.create.useMutation();
+  const report = trpc.notifications.report.useMutation();
 
   if (!listing.data) {
     return (
@@ -212,6 +213,22 @@ export default function ListingDetailScreen() {
             </Card>
           )}
 
+          <Card>
+            <Pressable
+              disabled={report.isPending || report.isSuccess}
+              onPress={() =>
+                report.mutate({
+                  listingId: item.id,
+                  reason: `${t("moderation.reportReason")} — annonce ${item.id}`,
+                })
+              }
+            >
+              <Text style={styles.reportButton}>
+                {report.isSuccess ? t("moderation.reportSent") : t("moderation.report")}
+              </Text>
+            </Pressable>
+          </Card>
+
           <SectionTitle>{t("listing.contactSeller")}</SectionTitle>
           <Card>
             <TextInput
@@ -256,6 +273,7 @@ const styles = StyleSheet.create({
   },
   declineText: { color: colors.negative, fontWeight: "700" },
   alertButton: { color: colors.gold, fontSize: 16, fontWeight: "700" },
+  reportButton: { color: colors.negative, fontSize: 14, fontWeight: "600" },
   gallery: { flexDirection: "row", gap: spacing.sm },
   photo: { width: 220, height: 220, borderRadius: 12 },
 });

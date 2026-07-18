@@ -464,6 +464,49 @@ export const disputes = cardtradeSchema.table("disputes", {
 });
 
 // ---------------------------------------------------------------------------
+// Notifications & modération
+// ---------------------------------------------------------------------------
+
+export const pushTokens = cardtradeSchema.table(
+  "push_tokens",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    token: text("token").notNull().unique(),
+    platform: text("platform").notNull(), // ios | android
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("push_tokens_user_idx").on(t.userId)],
+);
+
+export const reportStatusEnum = cardtradeSchema.enum("report_status", [
+  "open",
+  "reviewed",
+  "dismissed",
+]);
+
+/** Signalements d'annonces ou d'utilisateurs (modération manuelle v1). */
+export const reports = cardtradeSchema.table(
+  "reports",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    reporterId: uuid("reporter_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    listingId: uuid("listing_id").references(() => listings.id, { onDelete: "set null" }),
+    reportedUserId: uuid("reported_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    reason: text("reason").notNull(),
+    status: reportStatusEnum("status").notNull().default("open"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("reports_status_idx").on(t.status)],
+);
+
+// ---------------------------------------------------------------------------
 // Abonnements CardTrade PRO
 // ---------------------------------------------------------------------------
 

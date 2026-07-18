@@ -7,6 +7,7 @@ import { createClient } from "@supabase/supabase-js";
 import { appRouter, createContext, type AuthUser } from "@cardtrade/api";
 import { createDb } from "@cardtrade/db";
 import { startPriceSyncTimer } from "./jobs/price-sync.js";
+import { startAlertMatchTimer } from "./jobs/alert-match.js";
 
 const PORT = Number(process.env.PORT ?? 3001);
 /** Dossier du build web Expo (recette) — servi par ce même process. */
@@ -162,3 +163,4 @@ if (!existsSync(WEB_DIST)) {
 }
 
 startPriceSyncTimer(db);
+startAlertMatchTimer(db);

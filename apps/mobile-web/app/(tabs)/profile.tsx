@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -27,6 +28,10 @@ export default function ProfileScreen() {
   const utils = trpc.useUtils();
   const removeAlert = trpc.alerts.remove.useMutation({
     onSuccess: () => void utils.alerts.list.invalidate(),
+  });
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const deleteAccount = trpc.profile.deleteAccount.useMutation({
+    onSuccess: () => void supabase.auth.signOut(),
   });
 
   const currentLanguage = normalizeLanguage(i18n.language);
@@ -116,11 +121,36 @@ export default function ProfileScreen() {
           </Text>
         </Pressable>
       </Card>
+      <Link href="/legal" asChild>
+        <Pressable>
+          <Card>
+            <Text style={styles.link}>{t("account.legal")} →</Text>
+          </Card>
+        </Pressable>
+      </Link>
       {session && (
         <Card>
           <Pressable onPress={() => void supabase.auth.signOut()}>
             <Text style={styles.signOut}>{t("profile.signOut")}</Text>
           </Pressable>
+          <Pressable
+            disabled={deleteAccount.isPending}
+            onPress={() => {
+              if (!confirmDelete) {
+                setConfirmDelete(true);
+                return;
+              }
+              deleteAccount.mutate();
+            }}
+          >
+            <Text style={styles.signOut}>
+              {deleteAccount.isPending ? t("common.loading") : t("account.delete")}
+            </Text>
+          </Pressable>
+          {confirmDelete && !deleteAccount.isPending && (
+            <Muted>{t("account.deleteWarning")}</Muted>
+          )}
+          {deleteAccount.isError && <Muted>{deleteAccount.error.message}</Muted>}
         </Card>
       )}
     </Screen>

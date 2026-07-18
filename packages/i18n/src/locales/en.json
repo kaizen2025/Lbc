@@ -192,6 +192,20 @@
     "placeholder": "Your message…",
     "empty": "Start the conversation 👋"
   },
+  "moderation": {
+    "report": "🚩 Report this listing",
+    "reportSent": "Report sent — thanks, we're on it ✓",
+    "reportReason": "Describe the issue (scam, counterfeit, content…)"
+  },
+  "account": {
+    "delete": "Delete my account",
+    "deleteWarning": "Permanent deletion: listings, messages, collection and history will be erased. Tap again to confirm.",
+    "legal": "Legal notice & Terms"
+  },
+  "legal": {
+    "title": "Legal notice & Terms",
+    "body": "CardTrade is a marketplace connecting collectors. Trades are completed exclusively in person; CardTrade holds the payment in escrow until both parties validate the trade, and charges the service fee displayed before any payment. Each user is responsible for the accuracy of their listings and the legality of items sold. Personal data: your exact location is never public (only your city and an approximate distance are shown); you can delete your account and all your data at any time from your profile. Contact: support@cardtrade.app. ⚠️ Draft text to be legally reviewed before public launch."
+  },
   "photos": {
     "add": "📷 Add a photo",
     "uploading": "Uploading photo…",

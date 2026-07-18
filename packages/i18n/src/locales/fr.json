@@ -192,6 +192,20 @@
     "placeholder": "Ton message…",
     "empty": "Démarre la conversation 👋"
   },
+  "moderation": {
+    "report": "🚩 Signaler cette annonce",
+    "reportSent": "Signalement envoyé — merci, on regarde ✓",
+    "reportReason": "Explique le problème (arnaque, contrefaçon, contenu…)"
+  },
+  "account": {
+    "delete": "Supprimer mon compte",
+    "deleteWarning": "Suppression définitive : annonces, messages, collection et historique seront effacés. Appuie à nouveau pour confirmer.",
+    "legal": "Mentions légales & CGU"
+  },
+  "legal": {
+    "title": "Mentions légales & CGU",
+    "body": "CardTrade est une place de marché de mise en relation entre collectionneurs. Les échanges se concluent exclusivement en remise en main propre ; CardTrade séquestre le paiement jusqu'à la double validation de l'échange et prélève des frais de service affichés avant tout paiement. Chaque utilisateur est responsable de l'exactitude de ses annonces et de la conformité des objets vendus. Données personnelles : ta position exacte n'est jamais publique (seule ta ville et une distance approximative sont affichées) ; tu peux supprimer ton compte et l'ensemble de tes données à tout moment depuis ton profil. Contact : support@cardtrade.app. ⚠️ Texte provisoire à faire valider juridiquement avant l'ouverture publique."
+  },
   "photos": {
     "add": "📷 Ajouter une photo",
     "uploading": "Envoi de la photo…",

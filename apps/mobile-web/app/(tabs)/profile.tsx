@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text } from "react-native";
+import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { normalizeLanguage } from "@cardtrade/i18n";
 import { Card, Muted, Screen, SectionTitle } from "../../src/components/ui";
@@ -31,6 +32,15 @@ export default function ProfileScreen() {
         </Card>
       )}
 
+      <Link href="/paywall" asChild>
+        <Pressable>
+          <Card style={styles.proCard}>
+            <Text style={styles.proTitle}>{t("paywall.title")}</Text>
+            <Muted>{t("paywall.subtitle")}</Muted>
+          </Card>
+        </Pressable>
+      </Link>
+
       <SectionTitle>{t("profile.settings")}</SectionTitle>
       <Card>
         <Muted>{t("profile.language")}</Muted>
@@ -47,4 +57,6 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   username: { color: colors.text, fontSize: 18, fontWeight: "700" },
   languageSwitch: { color: colors.accent, fontSize: 16, fontWeight: "600" },
+  proCard: { borderColor: colors.gold },
+  proTitle: { color: colors.gold, fontSize: 18, fontWeight: "800" },
 });

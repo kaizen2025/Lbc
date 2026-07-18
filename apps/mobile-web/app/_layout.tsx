@@ -22,6 +22,10 @@ export default function RootLayout() {
           }}
         >
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="paywall"
+            options={{ presentation: "modal", title: "CardTrade PRO" }}
+          />
         </Stack>
       </QueryClientProvider>
     </trpc.Provider>

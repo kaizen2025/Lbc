@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import { priceHistory } from "@cardtrade/db";
 import { cardPriceQuerySchema } from "@cardtrade/validators";
 import { publicProcedure, router } from "../trpc.js";
+import { getUserPlan } from "../lib/plans.js";
 
 const RANGE_DAYS: Record<string, number | null> = {
   "1d": 1,
@@ -45,9 +46,14 @@ export const pricesRouter = router({
       order by ph.recorded_at asc
     `);
 
+    // La cote EU est publique ; la cote US (et donc l'écart EU/US) est PRO.
+    const isPro =
+      ctx.user != null && (await getUserPlan(ctx.db, ctx.user.id)) === "pro";
+
     return {
       eu: rows.filter((r) => r.market === "eu"),
-      us: rows.filter((r) => r.market === "us"),
+      us: isPro ? rows.filter((r) => r.market === "us") : [],
+      usLocked: !isPro,
     };
   }),
 });

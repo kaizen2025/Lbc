@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@cardtrade/i18n";
 import { Card, Muted, PriceChange, Screen, SectionTitle } from "../../src/components/ui";
@@ -8,6 +9,8 @@ import { colors, radius, spacing } from "../../src/theme";
 
 const RANGES = ["1d", "7d", "1m", "3m", "6m", "max"] as const;
 type Range = (typeof RANGES)[number];
+/** Plages réservées aux abonnés PRO (badge sur la puce, paywall si activée). */
+const PRO_RANGES: readonly Range[] = ["6m", "max"];
 
 export default function PortfolioScreen() {
   const { t, i18n } = useTranslation();
@@ -25,6 +28,7 @@ export default function PortfolioScreen() {
   const first = points[0]?.totalCents ?? latest;
   const delta = latest - first;
   const currency = market === "eu" ? "EUR" : "USD";
+  const proRequired = history.error?.message.startsWith("PRO_REQUIRED") ?? false;
 
   return (
     <Screen>
@@ -46,6 +50,7 @@ export default function PortfolioScreen() {
             >
               <Text style={range === r ? styles.rangeTextActive : styles.rangeText}>
                 {r.toUpperCase()}
+                {PRO_RANGES.includes(r) ? ` ${t("paywall.proBadge")}` : ""}
               </Text>
             </Pressable>
           ))}
@@ -65,10 +70,18 @@ export default function PortfolioScreen() {
             style={[styles.rangeChip, market === "us" && styles.rangeChipActive]}
           >
             <Text style={market === "us" ? styles.rangeTextActive : styles.rangeText}>
-              {t("portfolio.usMarket")}
+              {t("portfolio.usMarket")} {t("paywall.proBadge")}
             </Text>
           </Pressable>
         </View>
+
+        {proRequired && (
+          <Link href="/paywall" asChild>
+            <Pressable style={styles.proUpsell}>
+              <Text style={styles.proUpsellText}>{t("paywall.unlockPro")} →</Text>
+            </Pressable>
+          </Link>
+        )}
       </Card>
 
       <SectionTitle>{t("portfolio.mostValuable")}</SectionTitle>
@@ -107,4 +120,11 @@ const styles = StyleSheet.create({
   rangeText: { color: colors.textMuted, fontWeight: "600", fontSize: 13 },
   rangeTextActive: { color: colors.background, fontWeight: "700", fontSize: 13 },
   itemName: { color: colors.text, fontSize: 16, fontWeight: "600" },
+  proUpsell: {
+    backgroundColor: colors.gold,
+    borderRadius: radius.full,
+    paddingVertical: spacing.sm,
+    alignItems: "center",
+  },
+  proUpsellText: { color: colors.background, fontWeight: "800", fontSize: 15 },
 });

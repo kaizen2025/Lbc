@@ -89,6 +89,27 @@ export const disputeStatusEnum = cardtradeSchema.enum("dispute_status", [
   "resolved_release",
 ]);
 
+export const planEnum = cardtradeSchema.enum("plan", ["free", "pro"]);
+
+export const subscriptionStatusEnum = cardtradeSchema.enum("subscription_status", [
+  "active",
+  "trialing",
+  "past_due",
+  "canceled",
+]);
+
+export const subscriptionIntervalEnum = cardtradeSchema.enum("subscription_interval", [
+  "month",
+  "year",
+]);
+
+/** Source de facturation : Stripe (web), Apple/Google (in-app purchase mobile). */
+export const subscriptionProviderEnum = cardtradeSchema.enum("subscription_provider", [
+  "stripe",
+  "apple",
+  "google",
+]);
+
 // ---------------------------------------------------------------------------
 // Utilisateurs & profils
 // ---------------------------------------------------------------------------
@@ -439,6 +460,44 @@ export const disputes = cardtradeSchema.table("disputes", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   resolvedAt: timestamp("resolved_at", { withTimezone: true }),
 });
+
+// ---------------------------------------------------------------------------
+// Abonnements CardTrade PRO
+// ---------------------------------------------------------------------------
+
+/**
+ * Abonnement PRO d'un utilisateur. Le plan effectif d'un utilisateur est "pro"
+ * s'il possède un abonnement au statut active/trialing dont la période courante
+ * n'est pas expirée — voir getUserPlan() dans @cardtrade/api.
+ */
+export const subscriptions = cardtradeSchema.table(
+  "subscriptions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    plan: planEnum("plan").notNull().default("pro"),
+    status: subscriptionStatusEnum("status").notNull(),
+    interval: subscriptionIntervalEnum("interval").notNull(),
+    provider: subscriptionProviderEnum("provider").notNull(),
+    providerSubscriptionId: text("provider_subscription_id"),
+    priceCents: integer("price_cents").notNull(),
+    currency: currencyEnum("currency").notNull().default("EUR"),
+    currentPeriodEnd: timestamp("current_period_end", { withTimezone: true }).notNull(),
+    cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("subscriptions_user_idx").on(t.userId, t.status),
+    uniqueIndex("subscriptions_provider_uq").on(t.provider, t.providerSubscriptionId),
+  ],
+);
+
+export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
+  user: one(users, { fields: [subscriptions.userId], references: [users.id] }),
+}));
 
 // ---------------------------------------------------------------------------
 // Alertes ("préviens-moi si cette carte apparaît à moins de X km / X €")

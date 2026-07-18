@@ -6,6 +6,7 @@ import { chatRouter } from "./routers/chat.js";
 import { collectionRouter } from "./routers/collection.js";
 import { pricesRouter } from "./routers/prices.js";
 import { profileRouter } from "./routers/profile.js";
+import { subscriptionRouter } from "./routers/subscription.js";
 
 export const appRouter = router({
   catalog: catalogRouter,
@@ -15,6 +16,7 @@ export const appRouter = router({
   collection: collectionRouter,
   prices: pricesRouter,
   profile: profileRouter,
+  subscription: subscriptionRouter,
 });
 
 /** Type du router complet — importé par le client Expo pour le typage bout-en-bout. */

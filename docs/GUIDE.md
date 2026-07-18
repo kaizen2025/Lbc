@@ -413,6 +413,7 @@ git add -A && git commit -m "message clair" && git push
 | Un écran | `apps/mobile-web/app/(tabs)/…` |
 | Les jeux / cartes de démo | `packages/db/src/seed.ts` |
 | Les frais (1 €) | `.env` → `PLATFORM_FEE_EUR_CENTS` |
+| Les prix de l'abonnement PRO et les limites du gratuit | `packages/api/src/lib/plans.ts` |
 | Le rayon de recherche | `packages/validators/src/index.ts` |
 | Une règle métier | `packages/api/src/routers/…` |
 | Les tables de la base | `packages/db/src/schema.ts` (+ `pnpm db:generate` + `pnpm db:migrate`) |

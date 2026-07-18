@@ -79,6 +79,64 @@
     "language": "App language",
     "signOut": "Sign out"
   },
+  "paywall": {
+    "title": "CardTrade PRO",
+    "subtitle": "Level up: full price history, EU/US arbitrage and unlimited collection",
+    "proBadge": "PRO",
+    "features": {
+      "usMarket": {
+        "title": "US price & EU/US gap",
+        "subtitle": "Compare Europe and international markets, spot arbitrage opportunities"
+      },
+      "fullHistory": {
+        "title": "6M & MAX charts",
+        "subtitle": "Full history for your collection and every card"
+      },
+      "pnl": {
+        "title": "P&L tracking",
+        "subtitle": "Realized and unrealized gains against your purchase prices"
+      },
+      "unlimitedCollection": {
+        "title": "Unlimited collection",
+        "subtitle": "Add as many cards and sealed products as you want"
+      },
+      "unlimitedScans": {
+        "title": "Unlimited scanning",
+        "subtitle": "Identify your cards with the camera, no limits"
+      },
+      "alerts": {
+        "title": "Unlimited alerts",
+        "subtitle": "Get notified when a card shows up near you or drops in price"
+      },
+      "filters": {
+        "title": "Advanced filters & search history",
+        "subtitle": "Find exactly what you need, revisit your past searches"
+      },
+      "export": {
+        "title": "CSV export",
+        "subtitle": "Export your collection in one tap"
+      },
+      "weekly": {
+        "title": "Weekly performance updates",
+        "subtitle": "Your portfolio value in your pocket every week"
+      },
+      "themes": {
+        "title": "Exclusive themes & verified badge",
+        "subtitle": "Make the app yours and build trust in trades"
+      }
+    },
+    "yearly": "Yearly",
+    "monthly": "Monthly",
+    "perYear": "{{price}}/yr",
+    "perMonth": "{{price}}/mo",
+    "billedAnnually": "{{price}}/mo billed annually",
+    "billedMonthly": "billed monthly",
+    "savePercent": "Save {{percent}}%",
+    "cta": "Join CardTrade PRO",
+    "terms": "Subscription renews automatically, cancel anytime before the end of the current period.",
+    "comingSoon": "Payment ships with Phase 2 (Stripe + App Store / Play Store in-app purchases)",
+    "unlockPro": "Unlock with PRO"
+  },
   "auth": {
     "signIn": "Sign in",
     "signUp": "Create account",

@@ -33,6 +33,41 @@ AU SERVICE d'une marketplace de proximité en main propre.
 
 ---
 
+## 💰 MONÉTISATION — frais de transaction + CardTrade PRO
+
+Deux sources de revenus complémentaires :
+
+1. **1 € de frais de service** par transaction sécurisée (séquestre) — inchangé.
+2. **Abonnement CardTrade PRO** (prix alignés sur Collectr PRO) :
+   - **Mensuel : 7,99 €/mois**
+   - **Annuel : 59,99 €/an** (soit 4,99 €/mois, badge « Économise 38 % », option
+     mise en avant et présélectionnée sur le paywall)
+
+### Répartition Gratuit vs PRO
+
+| Fonctionnalité | Gratuit | PRO |
+|---|---|---|
+| Annonces, recherche locale, messagerie, transactions sécurisées | ✅ illimité | ✅ |
+| Collection / portfolio | ✅ jusqu'à 250 items | ✅ illimité |
+| Cote **Europe** du jour + graphique 1J/7J/1M/3M | ✅ | ✅ |
+| Graphiques **6M / MAX** (historique complet) | — | ✅ |
+| Cote **US/internationale** + **écart EU/US** (arbitrage) | — | ✅ |
+| Suivi **P&L** (gains réalisés / latents vs prix d'achat) | — | ✅ |
+| Alertes de prix / de disponibilité | 1 alerte | ✅ illimitées |
+| Filtres avancés + historique de recherche | — | ✅ |
+| Export CSV de la collection | — | ✅ |
+| Scans de cartes (Phase 4) | 10/mois | ✅ illimités |
+| Récap hebdo de performance (notification) | — | ✅ |
+| Thèmes exclusifs + badge profil vérifié | — | ✅ |
+
+Le paywall liste les avantages (icônes + titre + sous-titre), montre les deux cartes
+de prix côte à côte (l'annuelle sélectionnée par défaut avec le badge d'économie) et
+un CTA unique « Rejoindre CardTrade PRO ». Paiement : Stripe Billing sur le web,
+In-App Purchase Apple/Google sur mobile (obligatoire pour les stores) — même table
+`subscriptions` côté serveur, le champ `provider` distingue la source.
+
+---
+
 ## ⚙️ CONTRAINTE TECHNIQUE N°1 — UN SEUL LANGAGE, UN SEUL CODE
 
 **Interdiction de développer deux fois.** Tout le produit — Web, iOS, Android, backend —

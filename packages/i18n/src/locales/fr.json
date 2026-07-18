@@ -79,6 +79,64 @@
     "language": "Langue de l'application",
     "signOut": "Se déconnecter"
   },
+  "paywall": {
+    "title": "CardTrade PRO",
+    "subtitle": "Passe au niveau supérieur : cote complète, arbitrage EU/US et collection illimitée",
+    "proBadge": "PRO",
+    "features": {
+      "usMarket": {
+        "title": "Cote US & écart EU/US",
+        "subtitle": "Compare l'Europe et l'international, repère les opportunités d'arbitrage"
+      },
+      "fullHistory": {
+        "title": "Graphiques 6M & MAX",
+        "subtitle": "Tout l'historique de ta collection et de chaque carte"
+      },
+      "pnl": {
+        "title": "Suivi P&L",
+        "subtitle": "Gains réalisés et latents par rapport à tes prix d'achat"
+      },
+      "unlimitedCollection": {
+        "title": "Collection illimitée",
+        "subtitle": "Ajoute autant de cartes et de produits scellés que tu veux"
+      },
+      "unlimitedScans": {
+        "title": "Scans illimités",
+        "subtitle": "Identifie tes cartes à l'appareil photo sans limite"
+      },
+      "alerts": {
+        "title": "Alertes illimitées",
+        "subtitle": "Sois prévenu dès qu'une carte apparaît près de chez toi ou baisse de prix"
+      },
+      "filters": {
+        "title": "Filtres avancés & historique",
+        "subtitle": "Retrouve exactement ce que tu cherches, retrouve tes recherches passées"
+      },
+      "export": {
+        "title": "Export CSV",
+        "subtitle": "Exporte ta collection en un clic"
+      },
+      "weekly": {
+        "title": "Récap hebdo de performance",
+        "subtitle": "La valeur de ton portfolio chaque semaine dans ta poche"
+      },
+      "themes": {
+        "title": "Thèmes exclusifs & badge vérifié",
+        "subtitle": "Personnalise ton app et inspire confiance dans les échanges"
+      }
+    },
+    "yearly": "Annuel",
+    "monthly": "Mensuel",
+    "perYear": "{{price}}/an",
+    "perMonth": "{{price}}/mois",
+    "billedAnnually": "{{price}}/mois facturé annuellement",
+    "billedMonthly": "facturé mensuellement",
+    "savePercent": "Économise {{percent}} %",
+    "cta": "Rejoindre CardTrade PRO",
+    "terms": "Abonnement renouvelé automatiquement, annulable à tout moment avant la fin de la période en cours.",
+    "comingSoon": "Le paiement arrive avec la Phase 2 (Stripe + achats intégrés App Store / Play Store)",
+    "unlockPro": "Débloquer avec PRO"
+  },
   "auth": {
     "signIn": "Se connecter",
     "signUp": "Créer un compte",

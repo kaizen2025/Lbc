@@ -1,9 +1,10 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, count, desc, eq, sql } from "drizzle-orm";
 import { collectionItems, priceHistory } from "@cardtrade/db";
 import { addCollectionItemSchema, portfolioHistorySchema } from "@cardtrade/validators";
 import { protectedProcedure, router } from "../trpc.js";
+import { FREE_LIMITS, getUserPlan } from "../lib/plans.js";
 
 const RANGE_DAYS: Record<string, number | null> = {
   "1d": 1,
@@ -29,6 +30,19 @@ export const collectionRouter = router({
   add: protectedProcedure
     .input(addCollectionItemSchema)
     .mutation(async ({ ctx, input }) => {
+      const plan = await getUserPlan(ctx.db, ctx.user.id);
+      if (plan === "free") {
+        const [row] = await ctx.db
+          .select({ total: count() })
+          .from(collectionItems)
+          .where(eq(collectionItems.userId, ctx.user.id));
+        if ((row?.total ?? 0) >= FREE_LIMITS.collectionItems) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "PRO_REQUIRED:collection_limit",
+          });
+        }
+      }
       const [created] = await ctx.db
         .insert(collectionItems)
         .values({ ...input, userId: ctx.user.id })
@@ -75,6 +89,21 @@ export const collectionRouter = router({
   portfolioHistory: protectedProcedure
     .input(portfolioHistorySchema)
     .query(async ({ ctx, input }) => {
+      // Verrous PRO : plages 6M/MAX et cote US réservées aux abonnés.
+      if (
+        !FREE_LIMITS.chartRanges.includes(input.range) ||
+        !FREE_LIMITS.markets.includes(input.market)
+      ) {
+        const plan = await getUserPlan(ctx.db, ctx.user.id);
+        if (plan !== "pro") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: !FREE_LIMITS.markets.includes(input.market)
+              ? "PRO_REQUIRED:us_market"
+              : "PRO_REQUIRED:chart_range",
+          });
+        }
+      }
       const days = RANGE_DAYS[input.range] ?? null;
       const since = days
         ? sql`and ph.recorded_at >= current_date - ${days}::int`

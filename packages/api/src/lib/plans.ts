@@ -9,11 +9,11 @@ export const PRO_PRICING = {
   currency: "EUR" as const,
   monthly: { priceCents: 799, interval: "month" as const },
   yearly: {
-    priceCents: 5999,
+    priceCents: 5499,
     interval: "year" as const,
-    /** 59,99 €/an ≈ 4,99 €/mois — affiché sous le prix annuel. */
-    equivalentMonthlyCents: 499,
-    savingsPercent: 38,
+    /** 54,99 €/an ≈ 4,58 €/mois — affiché sous le prix annuel. */
+    equivalentMonthlyCents: 458,
+    savingsPercent: 43,
   },
 } as const;
 

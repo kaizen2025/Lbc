@@ -38,9 +38,9 @@ AU SERVICE d'une marketplace de proximité en main propre.
 Deux sources de revenus complémentaires :
 
 1. **1 € de frais de service** par transaction sécurisée (séquestre) — inchangé.
-2. **Abonnement CardTrade PRO** (prix alignés sur Collectr PRO) :
+2. **Abonnement CardTrade PRO** (positionné 5 € sous Collectr PRO à prestations égales) :
    - **Mensuel : 7,99 €/mois**
-   - **Annuel : 59,99 €/an** (soit 4,99 €/mois, badge « Économise 38 % », option
+   - **Annuel : 54,99 €/an** (soit 4,58 €/mois, badge « Économise 43 % », option
      mise en avant et présélectionnée sur le paywall)
 
 ### Répartition Gratuit vs PRO

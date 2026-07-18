@@ -37,6 +37,11 @@ export default function ProfileScreen() {
     retry: false,
     enabled: !!session,
   });
+  // Visible uniquement si le serveur confirme le rôle admin (FORBIDDEN sinon).
+  const adminCheck = trpc.admin.stats.useQuery(undefined, {
+    retry: false,
+    enabled: !!session,
+  });
   const cancelSub = trpc.subscription.cancel.useMutation({
     onSuccess: () => void utils.subscription.status.invalidate(),
   });
@@ -183,6 +188,23 @@ export default function ProfileScreen() {
           </Text>
         </Pressable>
       </Card>
+      {adminCheck.isSuccess && adminCheck.data && (
+        <Link href="/admin" asChild>
+          <Pressable>
+            <Card style={styles.proCard}>
+              <Text style={styles.proTitle}>⚙️ {t("admin.title")}</Text>
+              {(adminCheck.data.reports_open > 0 ||
+                adminCheck.data.disputes_open > 0) && (
+                <Muted>
+                  {adminCheck.data.reports_open + adminCheck.data.disputes_open} à
+                  traiter
+                </Muted>
+              )}
+            </Card>
+          </Pressable>
+        </Link>
+      )}
+
       <Link href="/legal" asChild>
         <Pressable>
           <Card>

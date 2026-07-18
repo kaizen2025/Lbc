@@ -192,6 +192,20 @@
     "placeholder": "Your message…",
     "empty": "Start the conversation 👋"
   },
+  "admin": {
+    "title": "Administration",
+    "stats": "{{users}} users · {{listings}} active listings · {{tx}} completed trades",
+    "reports": "Open reports",
+    "noReports": "No pending report ✓",
+    "review": "Review",
+    "reviewAndCancel": "Review + remove listing",
+    "dismiss": "Dismiss",
+    "disputes": "Open disputes",
+    "noDisputes": "No pending dispute ✓",
+    "refund": "Refund buyer",
+    "release": "Release seller",
+    "recentUsers": "Recent signups"
+  },
   "password": {
     "forgot": "Forgot password?",
     "resetSent": "Reset email sent — check your inbox",
@@ -276,6 +290,9 @@
     "validate": "Validate the trade",
     "youValidated": "You validated ✓ — waiting for the other party",
     "completed": "Trade complete 🎉 Both parties validated.",
+    "openDispute": "⚠️ Open a dispute",
+    "disputeReason": "Describe the issue (min. 10 characters)",
+    "disputeOpened": "Dispute opened — the transaction is frozen until arbitration",
     "status": {
       "pending_payment": "Awaiting payment",
       "escrowed": "Money secured — arrange the meetup",

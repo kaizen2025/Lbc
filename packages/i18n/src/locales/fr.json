@@ -192,6 +192,20 @@
     "placeholder": "Ton message…",
     "empty": "Démarre la conversation 👋"
   },
+  "admin": {
+    "title": "Administration",
+    "stats": "{{users}} utilisateurs · {{listings}} annonces actives · {{tx}} échanges terminés",
+    "reports": "Signalements ouverts",
+    "noReports": "Aucun signalement en attente ✓",
+    "review": "Traiter",
+    "reviewAndCancel": "Traiter + retirer l'annonce",
+    "dismiss": "Ignorer",
+    "disputes": "Litiges ouverts",
+    "noDisputes": "Aucun litige en attente ✓",
+    "refund": "Rembourser l'acheteur",
+    "release": "Libérer le vendeur",
+    "recentUsers": "Derniers inscrits"
+  },
   "password": {
     "forgot": "Mot de passe oublié ?",
     "resetSent": "Email de réinitialisation envoyé — vérifie ta boîte mail",
@@ -276,6 +290,9 @@
     "validate": "Valider l'échange",
     "youValidated": "Tu as validé ✓ — en attente de l'autre partie",
     "completed": "Échange terminé 🎉 Les deux parties ont validé.",
+    "openDispute": "⚠️ Ouvrir un litige",
+    "disputeReason": "Décris le problème (min. 10 caractères)",
+    "disputeOpened": "Litige ouvert — la transaction est gelée jusqu'à l'arbitrage",
     "status": {
       "pending_payment": "En attente de paiement",
       "escrowed": "Argent sécurisé — organisez le rendez-vous",

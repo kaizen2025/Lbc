@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { and, desc, eq, or, sql } from "drizzle-orm";
 import {
+  disputes,
   listings,
   offers,
   profiles,
@@ -202,6 +203,42 @@ export const transactionsRouter = router({
         return true;
       });
       return { completed };
+    }),
+
+  /** Ouvre un litige : gèle la transaction jusqu'à arbitrage admin. */
+  openDispute: protectedProcedure
+    .input(
+      z.object({
+        transactionId: z.string().uuid(),
+        reason: z.string().min(10).max(1000),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const tx = await ctx.db.query.transactions.findFirst({
+        where: eq(transactions.id, input.transactionId),
+      });
+      if (!tx) throw new TRPCError({ code: "NOT_FOUND" });
+      if (tx.buyerId !== ctx.user.id && tx.sellerId !== ctx.user.id) {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+      if (tx.status !== "escrowed" && tx.status !== "meetup_scheduled") {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Litige possible uniquement sur une transaction en cours",
+        });
+      }
+      await ctx.db.transaction(async (dbTx) => {
+        await dbTx.insert(disputes).values({
+          transactionId: tx.id,
+          openedById: ctx.user.id,
+          reason: input.reason,
+        });
+        await dbTx
+          .update(transactions)
+          .set({ status: "disputed" })
+          .where(eq(transactions.id, tx.id));
+      });
+      return { ok: true };
     }),
 
   review: protectedProcedure

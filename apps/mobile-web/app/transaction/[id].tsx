@@ -29,6 +29,11 @@ export default function TransactionScreen() {
   const validate = trpc.transactions.validate.useMutation({
     onSuccess: () => void utils.transactions.byId.invalidate(),
   });
+  const [disputeReason, setDisputeReason] = useState("");
+  const [showDispute, setShowDispute] = useState(false);
+  const openDispute = trpc.transactions.openDispute.useMutation({
+    onSuccess: () => void utils.transactions.byId.invalidate(),
+  });
 
   if (!tx.data) {
     return (
@@ -95,6 +100,39 @@ export default function TransactionScreen() {
             {item.iValidatedOther && !done && <Muted>{t("tx.youValidated")}</Muted>}
             {validate.isError && <Muted>{validate.error.message}</Muted>}
           </Card>
+
+          <Card>
+            {openDispute.isSuccess || item.status === "disputed" ? (
+              <Muted>{t("tx.disputeOpened")}</Muted>
+            ) : showDispute ? (
+              <>
+                <TextInput
+                  style={formStyles.input}
+                  placeholder={t("tx.disputeReason")}
+                  placeholderTextColor={colors.textMuted}
+                  value={disputeReason}
+                  onChangeText={setDisputeReason}
+                />
+                <Pressable
+                  style={formStyles.cta}
+                  disabled={openDispute.isPending || disputeReason.length < 10}
+                  onPress={() =>
+                    openDispute.mutate({
+                      transactionId: item.id,
+                      reason: disputeReason,
+                    })
+                  }
+                >
+                  <Text style={formStyles.ctaText}>{t("tx.openDispute")}</Text>
+                </Pressable>
+                {openDispute.isError && <Muted>{openDispute.error.message}</Muted>}
+              </>
+            ) : (
+              <Pressable onPress={() => setShowDispute(true)}>
+                <Text style={styles.disputeLink}>{t("tx.openDispute")}</Text>
+              </Pressable>
+            )}
+          </Card>
         </>
       )}
     </Screen>
@@ -107,6 +145,7 @@ const styles = StyleSheet.create({
   status: { color: colors.gold, fontSize: 15, fontWeight: "700" },
   completed: { color: colors.positive, fontSize: 17, fontWeight: "700" },
   qrCard: { alignItems: "center" },
+  disputeLink: { color: colors.negative, fontSize: 14, fontWeight: "600" },
   code: {
     color: colors.text,
     fontSize: 30,
